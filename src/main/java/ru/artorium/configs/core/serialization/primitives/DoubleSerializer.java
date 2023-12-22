@@ -1,6 +1,6 @@
-package ru.artorium.configs.serialization.primitives;
+package ru.artorium.configs.core.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.core.serialization.Serializer;
 
 public class DoubleSerializer implements Serializer<Double, Object> {
 

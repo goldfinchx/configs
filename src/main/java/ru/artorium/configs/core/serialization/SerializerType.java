@@ -1,4 +1,4 @@
-package ru.artorium.configs.serialization;
+package ru.artorium.configs.core.serialization;
 
 import java.util.Collection;
 import java.util.Map;
@@ -8,17 +8,17 @@ import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.collections.ArraySerializer;
-import ru.artorium.configs.serialization.collections.CollectionSerializer;
-import ru.artorium.configs.serialization.collections.MapSerializer;
-import ru.artorium.configs.serialization.minecraft.ItemStackSerializer;
-import ru.artorium.configs.serialization.minecraft.LocationSerializer;
-import ru.artorium.configs.serialization.primitives.DoubleSerializer;
-import ru.artorium.configs.serialization.primitives.EnumSerializer;
-import ru.artorium.configs.serialization.primitives.FloatSerializer;
-import ru.artorium.configs.serialization.primitives.IntegerSerializer;
-import ru.artorium.configs.serialization.primitives.LongSerializer;
-import ru.artorium.configs.serialization.primitives.StringSerializer;
+import ru.artorium.configs.core.serialization.collections.ArraySerializer;
+import ru.artorium.configs.core.serialization.collections.CollectionSerializer;
+import ru.artorium.configs.core.serialization.collections.MapSerializer;
+import ru.artorium.configs.core.serialization.minecraft.ItemStackSerializer;
+import ru.artorium.configs.core.serialization.minecraft.LocationSerializer;
+import ru.artorium.configs.core.serialization.primitives.DoubleSerializer;
+import ru.artorium.configs.core.serialization.primitives.EnumSerializer;
+import ru.artorium.configs.core.serialization.primitives.FloatSerializer;
+import ru.artorium.configs.core.serialization.primitives.IntegerSerializer;
+import ru.artorium.configs.core.serialization.primitives.LongSerializer;
+import ru.artorium.configs.core.serialization.primitives.StringSerializer;
 
 @Getter
 @AllArgsConstructor

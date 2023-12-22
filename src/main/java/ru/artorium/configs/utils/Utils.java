@@ -10,7 +10,8 @@ import java.util.Arrays;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import ru.artorium.configs.serialization.SerializerType;
+import ru.artorium.configs.core.annotations.Range;
+import ru.artorium.configs.core.serialization.SerializerType;
 
 public class Utils {
 
@@ -55,6 +56,13 @@ public class Utils {
     public static Object deserialize(Class fieldClass, Object object) {
         final Class objectClass = getObjectType(fieldClass, object);
         final SerializerType serializerType = getSerializerType(objectClass);
+
+        if (object instanceof Number) {
+            if (!ClassUtils.isInRange(fieldClass, (Number) object)) {
+                final Range range = (Range) fieldClass.getAnnotation(Range.class);
+                throw new RuntimeException("Value " + object + " is not in range of " + fieldClass + " field! It should be in range of " + range.min() + " and " + range.max());
+            }
+        }
 
         return serializerType.getSerializer().deserialize(objectClass, object);
     }
