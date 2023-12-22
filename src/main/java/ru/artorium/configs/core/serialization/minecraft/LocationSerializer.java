@@ -1,9 +1,9 @@
-package ru.artorium.configs.serialization.minecraft;
+package ru.artorium.configs.core.serialization.minecraft;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.core.serialization.Serializer;
 
 public class LocationSerializer implements Serializer<Location, JSONObject> {
 

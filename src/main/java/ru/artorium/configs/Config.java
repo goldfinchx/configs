@@ -9,7 +9,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.annotations.Ignore;
+import ru.artorium.configs.core.annotations.Ignore;
+import ru.artorium.configs.core.annotations.Range;
 import ru.artorium.configs.utils.Utils;
 
 @Getter
@@ -71,13 +72,7 @@ public abstract class Config {
 
     private void fillDefaults() {
         final JSONObject json = Utils.convertFile(this.file);
-        final Config defaultConfig;
-
-        try {
-            defaultConfig = this.getClass().getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Check if you added @NoArgsConstructor to your config class", e);
-        }
+        final Config defaultConfig = this.getTemplate();
 
         for (final Field field : this.getFields()) {
             field.setAccessible(true);
@@ -99,5 +94,7 @@ public abstract class Config {
     public void save(JSONObject json) {
         Utils.writeFile(this.file, json);
     }
+
+    abstract Config getTemplate();
 
 }

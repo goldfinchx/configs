@@ -1,11 +1,11 @@
-package ru.artorium.configs.serialization.collections;
+package ru.artorium.configs.core.serialization.collections;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.json.simple.JSONArray;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.core.serialization.Serializer;
 import ru.artorium.configs.utils.Utils;
 
 public class CollectionSerializer implements Serializer<Collection, JSONArray> {

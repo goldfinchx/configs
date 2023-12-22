@@ -2,6 +2,7 @@ package ru.artorium.configs.utils;
 
 import java.util.Collection;
 import java.util.Map;
+import ru.artorium.configs.core.annotations.Range;
 
 public class ClassUtils {
 
@@ -57,6 +58,19 @@ public class ClassUtils {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static boolean isInRange(Class<?> fieldClass, Number value) {
+        if (!fieldClass.isAnnotationPresent(Range.class)) {
+            return true;
+        }
+
+        if (!Number.class.isAssignableFrom(fieldClass)) {
+            throw new RuntimeException("Field " + fieldClass + " is not a number!");
+        }
+
+        final Range range = fieldClass.getAnnotation(Range.class);
+        return value.doubleValue() >= range.min() && value.doubleValue() <= range.max();
     }
 
     public static boolean isNumber(String string) {

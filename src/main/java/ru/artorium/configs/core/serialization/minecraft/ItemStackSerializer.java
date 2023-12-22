@@ -1,4 +1,4 @@
-package ru.artorium.configs.serialization.minecraft;
+package ru.artorium.configs.core.serialization.minecraft;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.core.serialization.Serializer;
 
 public class ItemStackSerializer implements Serializer<ItemStack, JSONObject> {
 

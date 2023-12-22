@@ -1,11 +1,11 @@
-package ru.artorium.configs.serialization.collections;
+package ru.artorium.configs.core.serialization.collections;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.core.serialization.Serializer;
 import ru.artorium.configs.utils.Utils;
 
 public class MapSerializer implements Serializer<Map, JSONObject> {
