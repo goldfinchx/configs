@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'io.freefair.lombok' version '8.4'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'io.papermc.paperweight.userdev' version '1.5.5'
+    id 'xyz.jpenilla.run-paper' version '2.1.0'
+}
+
+group 'ru.artorium.configs'
+version '0.0.1b'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT")
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+}
