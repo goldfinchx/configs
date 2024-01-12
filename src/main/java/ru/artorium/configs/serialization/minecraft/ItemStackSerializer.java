@@ -1,4 +1,4 @@
-package ru.artorium.configs.core.serialization.minecraft;
+package ru.artorium.configs.serialization.minecraft;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -9,12 +9,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.core.serialization.Serializer;
+import ru.artorium.configs.serialization.Serializer;
 
 public class ItemStackSerializer implements Serializer<ItemStack, JSONObject> {
 
     @Override
-    public ItemStack deserialize(Class fieldClass, Object object) {
+    public ItemStack deserialize(Class<?> fieldClass, Object object) {
         final JSONObject json = (JSONObject) object;
         final ItemStack itemStack = new ItemStack(Material.valueOf((String) json.get("type")), (int) (long) json.get("amount"));
         final ItemMeta itemMeta = itemStack.getItemMeta();
@@ -47,7 +47,7 @@ public class ItemStackSerializer implements Serializer<ItemStack, JSONObject> {
     }
 
     @Override
-    public JSONObject serialize(Object object) {
+    public JSONObject serialize(Class<?> fieldClass, Object object) {
         final JSONObject json = new JSONObject();
         final ItemStack itemStack = (ItemStack) object;
 

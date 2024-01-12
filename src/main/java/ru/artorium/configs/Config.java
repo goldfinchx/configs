@@ -6,53 +6,48 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.json.simple.JSONObject;
-import ru.artorium.configs.core.annotations.Ignore;
-import ru.artorium.configs.core.annotations.Range;
-import ru.artorium.configs.utils.Utils;
+import ru.artorium.configs.annotations.Ignore;
+import ru.artorium.configs.formats.Format;
+import ru.artorium.configs.formats.JSON;
+import ru.artorium.configs.formats.YAML;
+import ru.artorium.configs.serialization.Serializer;
 
 @Getter
 @NoArgsConstructor
 public abstract class Config {
 
-    private String fileName;
+    private Map<String, Object> map;
     private File file;
+    private Format format;
 
     public Config(String fileName, String path) {
-        this.fileName = fileName;
-        this.file = new File(path, this.fileName + ".json");
-        this.load();
-    }
-
-    public void reload() {
-        final JSONObject json = Utils.convertFile(this.file);
-        this.fillDefaults();
-
-        for (final Field field : this.getFields()) {
-            field.setAccessible(true);
-            try {
-                field.set(this, Utils.deserialize(field.getType(), json.get(field.getName())));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void load() {
-        if (!this.file.exists()) {
-            this.create();
-        }
-
-        if (this.file.length() == 0) {
-            this.fillDefaults();
-        }
+        this.file = new File(path, fileName);
+        this.format = fileName.endsWith(".yaml") || fileName.endsWith(".yml") ? new YAML() : new JSON();
+        this.map = this.format.readFile(this.file);
 
         this.reload();
     }
 
-    private void create() {
+    public void reload() {
+        if (!this.file.exists()) {
+            this.createFile();
+        }
+
+        this.fillMissingFields();
+
+        this.getFields(this).forEach(field -> {
+            try {
+                field.set(this, Serializer.deserialize(field.getType(), field.getType(), this.map.get(field.getName())));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void createFile() {
         if (!this.file.getParentFile().exists()) {
             this.file.getParentFile().mkdirs();
         }
@@ -64,37 +59,37 @@ public abstract class Config {
         }
     }
 
-    private List<Field> getFields() {
-        return Arrays.stream(this.getClass().getDeclaredFields())
-            .filter(field -> !field.isAnnotationPresent(Ignore.class))
-            .toList();
-    }
-
-    private void fillDefaults() {
-        final JSONObject json = Utils.convertFile(this.file);
+    private void fillMissingFields() {
         final Config defaultConfig = this.getTemplate();
 
-        for (final Field field : this.getFields()) {
-            field.setAccessible(true);
+        this.getFields(this).forEach(field -> {
+            this.map.computeIfAbsent(field.getName(), $ -> {
+                try {
+                    return Serializer.serialize(field.getType(), field.getType(), field.get(defaultConfig));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-            if (json.containsKey(field.getName())) {
-                return;
-            }
+        });
 
-            try {
-                json.put(field.getName(), Utils.serialize(field.get(defaultConfig)));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+        this.format.writeFile(this.file, this.map);
+    }
+
+    private Config getTemplate() {
+        try {
+            return this.getClass().getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            System.err.println("Cannot create an instance of " + this.getClass().getName() + " class, please check if it has a default no args constructor");
+            throw new RuntimeException(e);
         }
-
-        this.save(json);
     }
 
-    public void save(JSONObject json) {
-        Utils.writeFile(this.file, json);
+    private List<Field> getFields(Object object) {
+        return Arrays.stream(object.getClass().getDeclaredFields())
+            .filter(field -> !field.isAnnotationPresent(Ignore.class))
+            .peek(field -> field.setAccessible(true))
+            .toList();
     }
-
-    abstract Config getTemplate();
 
 }
