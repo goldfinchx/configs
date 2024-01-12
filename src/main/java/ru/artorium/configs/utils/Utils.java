@@ -5,13 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import ru.artorium.configs.core.annotations.Range;
-import ru.artorium.configs.core.serialization.SerializerType;
+import ru.artorium.configs.annotations.Ignore;
+import ru.artorium.configs.serialization.SerializerType;
 
 public class Utils {
 
@@ -40,78 +43,30 @@ public class Utils {
         }
     }
 
-
-    public static Object serialize(Object object) {
-        final Class<?> objectClass = getObjectType(object.getClass(), object);
-        final SerializerType serializerType = getSerializerType(objectClass);
-        final Object serializedObject = serializerType.getSerializer().serialize(object);
-
-        if (serializerType.isRequireTypification()) {
-            ((JSONObject) serializedObject).put("_type", object.getClass().getName());
-        }
-
-        return serializedObject;
+    public static Object serialize(Class<?> fieldClass, Object object) {
+        return getSerializerType(fieldClass).getSerializer().serialize(fieldClass, object);
     }
 
-    public static Object deserialize(Class fieldClass, Object object) {
-        final Class objectClass = getObjectType(fieldClass, object);
-        final SerializerType serializerType = getSerializerType(objectClass);
-
-        if (object instanceof Number) {
-            if (!ClassUtils.isInRange(fieldClass, (Number) object)) {
-                final Range range = (Range) fieldClass.getAnnotation(Range.class);
-                throw new RuntimeException("Value " + object + " is not in range of " + fieldClass + " field! It should be in range of " + range.min() + " and " + range.max());
-            }
-        }
-
-        return serializerType.getSerializer().deserialize(objectClass, object);
+    public static Object deserialize(Class<?> fieldClass, Object object) {
+        return getSerializerType(fieldClass).getSerializer().deserialize(fieldClass, object);
     }
 
-    private static SerializerType getSerializerType(Class objectClass) {
+    private static SerializerType getSerializerType(Class<?> fieldClass) {
+        if (Collection.class.isAssignableFrom(fieldClass)) {
+            fieldClass = Collection.class;
+        }
+
+        final Class<?> finalFieldClass = fieldClass;
         return Arrays.stream(SerializerType.values())
-            .filter(type -> type.getFrom().equals(objectClass))
+            .filter(type -> type.getFrom().equals(finalFieldClass))
             .findFirst()
-            .orElseThrow(() -> new RuntimeException("Unknown type: " + objectClass));
+            .orElse(SerializerType.OBJECT);
     }
 
-    private static Class getObjectType(Class fieldClass, Object object) {
-        if (object instanceof Number || (object instanceof String && ClassUtils.isNumber((String) object))) {
-            if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-                return Integer.class;
-            } else if (fieldClass.equals(Double.class) || fieldClass.equals(double.class))  {
-                return Double.class;
-            } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
-                return Long.class;
-            } else if (fieldClass.equals(Float.class) || fieldClass.equals(float.class)) {
-                return Float.class;
-            } else if (fieldClass.equals(Byte.class) || fieldClass.equals(byte.class)) {
-                return Byte.class;
-            } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
-                return Short.class;
-            }
-        }
-
-        if (object instanceof JSONObject jsonObject && jsonObject.containsKey("_type")) {
-            try {
-                return Class.forName((String) jsonObject.get("_type"));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (fieldClass.isEnum()) {
-            return Enum.class;
-        }
-
-        if (object instanceof String && fieldClass.equals(String.class)) {
-            return String.class;
-        }
-
-        if (ClassUtils.getCollectionType(object) != null) {
-            return ClassUtils.getCollectionType(object);
-        }
-
-        return object.getClass();
+    public static List<Field> getFields(Object object) {
+        return Arrays.stream(object.getClass().getDeclaredFields())
+            .filter(field -> !field.isAnnotationPresent(Ignore.class))
+            .peek(field -> field.setAccessible(true))
+            .toList();
     }
-
 }
