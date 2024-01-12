@@ -2,22 +2,32 @@ package ru.artorium.configs;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.json.simple.JSONObject;
-import ru.artorium.configs.utils.Utils;
+import ru.artorium.configs.annotations.Ignore;
+import ru.artorium.configs.formats.Format;
+import ru.artorium.configs.formats.JSON;
+import ru.artorium.configs.formats.YAML;
+import ru.artorium.configs.serialization.Serializer;
 
 @Getter
 @NoArgsConstructor
 public abstract class Config {
 
-    private JSONObject json;
+    private Map<String, Object> map;
     private File file;
+    private Format format;
 
     public Config(String fileName, String path) {
-        this.file = new File(path, fileName + ".json");
-        this.json = Utils.convertFile(this.file);
+        this.file = new File(path, fileName);
+        this.format = fileName.endsWith(".yaml") || fileName.endsWith(".yml") ? new YAML() : new JSON();
+        this.map = this.format.readFile(this.file);
+
         this.reload();
     }
 
@@ -28,9 +38,9 @@ public abstract class Config {
 
         this.fillMissingFields();
 
-        Utils.getFields(this).forEach(field -> {
+        this.getFields(this).forEach(field -> {
             try {
-                field.set(this, Utils.deserialize(field.getType(), this.json.get(field.getName())));
+                field.set(this, Serializer.deserialize(field.getType(), field.getType(), this.map.get(field.getName())));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -52,10 +62,10 @@ public abstract class Config {
     private void fillMissingFields() {
         final Config defaultConfig = this.getTemplate();
 
-        Utils.getFields(this).forEach(field -> {
-            this.json.computeIfAbsent(field.getName(), $ -> {
+        this.getFields(this).forEach(field -> {
+            this.map.computeIfAbsent(field.getName(), $ -> {
                 try {
-                    return Utils.serialize(field.getType(), field.get(defaultConfig));
+                    return Serializer.serialize(field.getType(), field.getType(), field.get(defaultConfig));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -63,7 +73,7 @@ public abstract class Config {
 
         });
 
-        Utils.writeFile(this.file, this.json);
+        this.format.writeFile(this.file, this.map);
     }
 
     private Config getTemplate() {
@@ -74,4 +84,12 @@ public abstract class Config {
             throw new RuntimeException(e);
         }
     }
+
+    private List<Field> getFields(Object object) {
+        return Arrays.stream(object.getClass().getDeclaredFields())
+            .filter(field -> !field.isAnnotationPresent(Ignore.class))
+            .peek(field -> field.setAccessible(true))
+            .toList();
+    }
+
 }

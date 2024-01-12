@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.simple.JSONObject;
 import ru.artorium.configs.serialization.Serializer;
-import ru.artorium.configs.utils.Utils;
 
 public class MapSerializer implements Serializer<Map, JSONObject> {
 
@@ -20,13 +19,14 @@ public class MapSerializer implements Serializer<Map, JSONObject> {
         json.put("_keyType", keyType.getTypeName());
         json.put("_valueType", valueType.getTypeName());
 
-        map.forEach(((k, v) -> json.put(Utils.serialize(keyType, k), Utils.serialize(valueType, v))));
+        map.forEach(((k, v) -> json.put(Serializer.serialize(fieldClass, keyType, k), Serializer.serialize(fieldClass, valueType, v))));
         return json;
     }
 
     @Override
     public Map deserialize(Class fieldClass, Object object) {
         final JSONObject json = (JSONObject) object;
+
         final Class<?> keyType;
         final Class<?> valueType;
 
@@ -43,7 +43,7 @@ public class MapSerializer implements Serializer<Map, JSONObject> {
                 return;
             }
 
-            map.put(Utils.deserialize(keyType, k), Utils.deserialize(valueType, v));
+            map.put(Serializer.deserialize(fieldClass, keyType, k), Serializer.deserialize(fieldClass, valueType, v));
         });
         return new HashMap(Collections.checkedMap(map, keyType, valueType));
     }

@@ -8,7 +8,6 @@ public class ComponentSerializer implements Serializer<Component, String> {
 
     @Override
     public Component deserialize(Class<?> fieldClass, Object object) {
-
         return MiniMessage.miniMessage().deserialize((String) object);
     }
 

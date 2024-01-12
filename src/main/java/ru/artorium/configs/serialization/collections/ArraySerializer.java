@@ -1,12 +1,11 @@
 package ru.artorium.configs.serialization.collections;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import org.json.simple.JSONArray;
 import ru.artorium.configs.serialization.Serializer;
-import ru.artorium.configs.utils.Utils;
+import ru.artorium.configs.serialization.SerializerType;
 
 public class ArraySerializer implements Serializer<Object[], JSONArray> {
 
@@ -15,7 +14,7 @@ public class ArraySerializer implements Serializer<Object[], JSONArray> {
         final JSONArray array = (JSONArray) object;
         final Class<?> genericClass = this.getArrayType(fieldClass);
 
-        return array.stream().map(o -> Utils.deserialize(genericClass, o)).toArray();
+        return array.stream().map(o -> Serializer.deserialize(fieldClass, genericClass, o)).toArray();
     }
 
     @Override
@@ -24,7 +23,7 @@ public class ArraySerializer implements Serializer<Object[], JSONArray> {
         final List<?> list = Arrays.asList((Object[]) object);
         final Class<?> genericClass = this.getArrayType(fieldClass);
 
-        list.forEach(value -> json.add(Utils.serialize(genericClass, value)));
+        list.forEach(value -> json.add(SerializerType.getByClass(fieldClass).getSerializer().serialize(genericClass, value)));
         return json;
     }
 

@@ -52,4 +52,16 @@ public enum SerializerType {
         this.requireTypification = false;
     }
 
+    public static SerializerType getByClass(Class<?> fieldClass) {
+        if (Collection.class.isAssignableFrom(fieldClass)) {
+            fieldClass = Collection.class;
+        }
+
+        final Class<?> finalFieldClass = fieldClass;
+        return java.util.Arrays.stream(SerializerType.values())
+            .filter(type -> type.getFrom().equals(finalFieldClass))
+            .findFirst()
+            .orElse(SerializerType.OBJECT);
+    }
+
 }
