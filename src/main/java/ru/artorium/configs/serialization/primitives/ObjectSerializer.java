@@ -18,6 +18,8 @@ public class ObjectSerializer implements Serializer<Object, JSONObject> {
             throw new RuntimeException(e);
         }
 
+
+
         Utils.getFields(instance).forEach(objectField -> {
             try {
                 objectField.set(instance, Utils.deserialize(objectField.getType(), jsonObject.get(objectField.getName())));
