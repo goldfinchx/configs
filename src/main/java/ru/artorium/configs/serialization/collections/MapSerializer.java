@@ -19,12 +19,12 @@ public class MapSerializer implements Serializer<Map, JSONObject> {
         json.put("_keyType", keyType.getTypeName());
         json.put("_valueType", valueType.getTypeName());
 
-        map.forEach(((k, v) -> json.put(Serializer.serialize(fieldClass, keyType, k), Serializer.serialize(fieldClass, valueType, v))));
+        map.forEach(((k, v) -> json.put(Serializer.serialize(keyType, keyType, k), Serializer.serialize(valueType, valueType, v))));
         return json;
     }
 
     @Override
-    public Map deserialize(Class fieldClass, Object object) {
+    public Map deserialize(Class<?> fieldClass, Object object) {
         final JSONObject json = (JSONObject) object;
 
         final Class<?> keyType;
@@ -43,7 +43,7 @@ public class MapSerializer implements Serializer<Map, JSONObject> {
                 return;
             }
 
-            map.put(Serializer.deserialize(fieldClass, keyType, k), Serializer.deserialize(fieldClass, valueType, v));
+            map.put(Serializer.deserialize(keyType, keyType, k), Serializer.deserialize(valueType, valueType, v));
         });
         return new HashMap(Collections.checkedMap(map, keyType, valueType));
     }

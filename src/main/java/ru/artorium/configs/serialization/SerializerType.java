@@ -53,8 +53,24 @@ public enum SerializerType {
     }
 
     public static SerializerType getByClass(Class<?> fieldClass) {
+        if (fieldClass.isEnum()) {
+            fieldClass = Enum.class;
+        }
+
         if (Collection.class.isAssignableFrom(fieldClass)) {
             fieldClass = Collection.class;
+        }
+
+        if (Map.class.isAssignableFrom(fieldClass)) {
+            fieldClass = Map.class;
+        }
+
+        if (Component.class.isAssignableFrom(fieldClass)) {
+            fieldClass = Component.class;
+        }
+
+        if (fieldClass.isArray()) {
+            fieldClass = Object[].class;
         }
 
         final Class<?> finalFieldClass = fieldClass;
