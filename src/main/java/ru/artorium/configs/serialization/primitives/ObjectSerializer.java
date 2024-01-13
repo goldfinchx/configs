@@ -31,7 +31,7 @@ public class ObjectSerializer implements Serializer<Object, JSONObject> {
 
         this.getFields(instance).forEach(objectField -> {
             try {
-                objectField.set(instance, Serializer.deserialize(fieldClass, objectField.getType(), json.get(objectField.getName())));
+                objectField.set(instance, Serializer.deserialize(objectField.getType(), objectField.getType(), json.get(objectField.getName())));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -46,7 +46,8 @@ public class ObjectSerializer implements Serializer<Object, JSONObject> {
 
         this.getFields(object).forEach(objectField -> {
             try {
-                jsonObject.put(objectField.getName(), Serializer.serialize(fieldClass, objectField.getType(), objectField.get(object)));
+                jsonObject.put(objectField.getName(), Serializer.serialize(objectField.getType(), objectField.getType(),
+                    objectField.get(object)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
