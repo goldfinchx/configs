@@ -9,11 +9,12 @@ import org.json.simple.JSONObject;
 import ru.artorium.configs.Utils;
 import ru.artorium.configs.annotations.Ignore;
 import ru.artorium.configs.serialization.GenericSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class ObjectSerializer implements GenericSerializer<Object, JSONObject> {
+public class ObjectSerializer implements SpecificSerializer<Object, JSONObject> {
 
     @Override
-    public Object deserialize(Field field, Object object) {
+    public Object deserialize(Class<?> classField, Object object) {
         final JSONObject json;
 
         if (object instanceof LinkedHashMap<?,?>) {
@@ -25,7 +26,7 @@ public class ObjectSerializer implements GenericSerializer<Object, JSONObject> {
         final Object instance;
 
         try {
-            instance = field.getType().getConstructor().newInstance();
+            instance = classField.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -42,7 +43,7 @@ public class ObjectSerializer implements GenericSerializer<Object, JSONObject> {
     }
 
     @Override
-    public JSONObject serialize(Field field, Object object) {
+    public JSONObject serialize(Object object) {
         final JSONObject jsonObject = new JSONObject();
 
         this.getFields(object).forEach(objectField -> {

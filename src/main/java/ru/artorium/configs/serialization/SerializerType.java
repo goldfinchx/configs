@@ -32,26 +32,18 @@ public enum SerializerType {
     DOUBLE(double.class, String.class, new DoubleSerializer()),
     LONG(long.class, String.class, new LongSerializer()),
     FLOAT(float.class, String.class, new FloatSerializer()),
-    ENUM(Enum.class, String.class, new EnumSerializer(), true),
-    ITEMSTACK(ItemStack.class, JSONObject.class, new ItemStackSerializer(), true),
-    LOCATION(Location.class, JSONObject.class, new LocationSerializer(), true),
+    ENUM(Enum.class, String.class, new EnumSerializer()),
+    ITEMSTACK(ItemStack.class, JSONObject.class, new ItemStackSerializer()),
+    LOCATION(Location.class, JSONObject.class, new LocationSerializer()),
     COMPONENT(Component.class, String.class, new ComponentSerializer()),
     MAP(Map.class, JSONObject.class, new MapSerializer()),
     COLLECTION(Collection.class, JSONArray.class, new CollectionSerializer()),
     ARRAY(Object[].class, JSONArray.class, new ArraySerializer()),
-    OBJECT(Object.class, JSONObject.class, new ObjectSerializer(), true);
+    OBJECT(Object.class, JSONObject.class, new ObjectSerializer());
 
     private final Class<?> from;
     private final Class<?> to;
     private final Serializer serializer;
-    private final boolean requireTypification;
-
-    SerializerType(Class<?> from, Class<?> to, Serializer serializer) {
-        this.from = from;
-        this.to = to;
-        this.serializer = serializer;
-        this.requireTypification = false;
-    }
 
     public static SerializerType getByClass(Class<?> fieldClass) {
         if (fieldClass.isEnum()) {
