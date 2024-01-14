@@ -48,7 +48,7 @@ public class ObjectSerializer implements SpecificSerializer<Object, JSONObject> 
 
         this.getFields(object).forEach(objectField -> {
             try {
-                jsonObject.put(objectField.getName(), Utils.serializeSpecific(objectField.getType(), objectField.get(object)));
+                jsonObject.put(objectField.getName(), Utils.serialize(objectField, objectField.get(object)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
