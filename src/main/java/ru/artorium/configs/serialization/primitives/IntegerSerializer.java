@@ -1,16 +1,16 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class IntegerSerializer implements Serializer<Integer, Object> {
+public class IntegerSerializer implements SimpleSerializer<Integer, Object> {
 
     @Override
-    public Integer deserialize(Class<?> fieldClass, Object object) {
+    public Integer deserialize(Object object) {
         return Integer.parseInt((String) object);
     }
 
     @Override
-    public String serialize(Class<?> fieldClass, Object object) {
+    public String serialize(Object object) {
         return object.toString();
     }
 

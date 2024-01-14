@@ -6,13 +6,14 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import org.json.simple.JSONObject;
+import ru.artorium.configs.Utils;
 import ru.artorium.configs.annotations.Ignore;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.GenericSerializer;
 
-public class ObjectSerializer implements Serializer<Object, JSONObject> {
+public class ObjectSerializer implements GenericSerializer<Object, JSONObject> {
 
     @Override
-    public Object deserialize(Class<?> fieldClass, Object object) {
+    public Object deserialize(Field field, Object object) {
         final JSONObject json;
 
         if (object instanceof LinkedHashMap<?,?>) {
@@ -24,14 +25,14 @@ public class ObjectSerializer implements Serializer<Object, JSONObject> {
         final Object instance;
 
         try {
-            instance = fieldClass.getConstructor().newInstance();
+            instance = field.getType().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
         this.getFields(instance).forEach(objectField -> {
             try {
-                objectField.set(instance, Serializer.deserialize(objectField.getType(), objectField.getType(), json.get(objectField.getName())));
+                objectField.set(instance, Utils.deserialize(objectField, json.get(objectField.getName())));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -41,13 +42,12 @@ public class ObjectSerializer implements Serializer<Object, JSONObject> {
     }
 
     @Override
-    public JSONObject serialize(Class<?> fieldClass, Object object) {
+    public JSONObject serialize(Field field, Object object) {
         final JSONObject jsonObject = new JSONObject();
 
         this.getFields(object).forEach(objectField -> {
             try {
-                jsonObject.put(objectField.getName(), Serializer.serialize(objectField.getType(), objectField.getType(),
-                    objectField.get(object)));
+                jsonObject.put(objectField.getName(), Utils.serializeSpecific(objectField.getType(), objectField.get(object)));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

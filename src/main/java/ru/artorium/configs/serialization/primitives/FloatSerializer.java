@@ -1,16 +1,16 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class FloatSerializer implements Serializer<Float, Object> {
+public class FloatSerializer implements SimpleSerializer<Float, Object> {
 
     @Override
-    public Float deserialize(Class<?> fieldClass, Object object) {
+    public Float deserialize(Object object) {
         return Float.parseFloat((String) object);
     }
 
     @Override
-    public String serialize(Class<?> fieldClass, Object object) {
+    public String serialize(Object object) {
         return object.toString();
     }
 

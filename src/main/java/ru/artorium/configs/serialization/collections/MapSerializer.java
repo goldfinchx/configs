@@ -1,51 +1,46 @@
 package ru.artorium.configs.serialization.collections;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import oshi.util.tuples.Pair;
+import ru.artorium.configs.Utils;
+import ru.artorium.configs.serialization.GenericSerializer;
 
-public class MapSerializer implements Serializer<Map, JSONObject> {
+public class MapSerializer implements GenericSerializer<Map, JSONObject> {
 
     @Override
-    public JSONObject serialize(Class<?> fieldClass, Object object) {
+    public JSONObject serialize(Field field, Object object) {
         final JSONObject json = new JSONObject();
+        final Pair<Class<?>, Class<?>> genericTypes = this.getGenericTypes(field);
+        final Class<?> keyType = genericTypes.getA();
+        final Class<?> valueType = genericTypes.getB();
         final Map map = (Map) object;
-        final Map.Entry entry = (Map.Entry) map.entrySet().stream().findFirst().get();
-        final Class<?> keyType = entry.getKey().getClass();
-        final Class<?> valueType = entry.getValue().getClass();
 
-        json.put("_keyType", keyType.getTypeName());
-        json.put("_valueType", valueType.getTypeName());
-
-        map.forEach(((k, v) -> json.put(Serializer.serialize(keyType, keyType, k), Serializer.serialize(valueType, valueType, v))));
+        map.forEach(((k, v) -> json.put(Utils.serializeSpecific(keyType, k), Utils.serializeSpecific(valueType, v))));
         return json;
     }
 
     @Override
-    public Map deserialize(Class<?> fieldClass, Object object) {
+    public Map deserialize(Field field, Object object) {
         final JSONObject json = (JSONObject) object;
-
-        final Class<?> keyType;
-        final Class<?> valueType;
-
-        try {
-            keyType = Class.forName((String) json.get("_keyType"));
-            valueType = Class.forName((String) json.get("_valueType"));
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
+        final Pair<Class<?>, Class<?>> genericTypes = this.getGenericTypes(field);
+        final Class<?> keyType = genericTypes.getA();
+        final Class<?> valueType = genericTypes.getB();
         final Map map = new HashMap<>();
-        json.forEach((k, v) -> {
-            if (k.equals("_keyType") || k.equals("_valueType")) {
-                return;
-            }
 
-            map.put(Serializer.deserialize(keyType, keyType, k), Serializer.deserialize(valueType, valueType, v));
-        });
+        json.forEach((k, v) -> map.put(Utils.serializeSpecific(keyType, k), Utils.serializeSpecific(valueType, v)));
         return new HashMap(Collections.checkedMap(map, keyType, valueType));
+    }
+
+    private Pair<Class<?>, Class<?>> getGenericTypes(Field field) {
+        final ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+        final Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+        final Class<?> valueType = (Class<?>) parameterizedType.getActualTypeArguments()[1];
+        return new Pair(keyType, valueType);
     }
 
 }

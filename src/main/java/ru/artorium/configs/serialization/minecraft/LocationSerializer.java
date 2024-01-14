@@ -3,12 +3,12 @@ package ru.artorium.configs.serialization.minecraft;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class LocationSerializer implements Serializer<Location, JSONObject> {
+public class LocationSerializer implements SimpleSerializer<Location, JSONObject> {
 
     @Override
-    public Location deserialize(Class<?> fieldClass, Object object) {
+    public Location deserialize(Object object) {
         final JSONObject json = (JSONObject) object;
         final Location location = new Location(null, 0, 0, 0);
 
@@ -28,7 +28,7 @@ public class LocationSerializer implements Serializer<Location, JSONObject> {
     }
 
     @Override
-    public JSONObject serialize(Class<?> fieldClass, Object object) {
+    public JSONObject serialize(Object object) {
         final JSONObject json = new JSONObject();
         final Location location = (Location) object;
 

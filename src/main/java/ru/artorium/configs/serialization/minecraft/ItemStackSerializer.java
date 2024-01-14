@@ -9,12 +9,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class ItemStackSerializer implements Serializer<ItemStack, JSONObject> {
+public class ItemStackSerializer implements SimpleSerializer<ItemStack, JSONObject> {
 
     @Override
-    public ItemStack deserialize(Class<?> fieldClass, Object object) {
+    public ItemStack deserialize(Object object) {
         final JSONObject json = (JSONObject) object;
         final ItemStack itemStack = new ItemStack(Material.valueOf((String) json.get("type")), (int) (long) json.get("amount"));
         final ItemMeta itemMeta = itemStack.getItemMeta();
@@ -47,7 +47,7 @@ public class ItemStackSerializer implements Serializer<ItemStack, JSONObject> {
     }
 
     @Override
-    public JSONObject serialize(Class<?> fieldClass, Object object) {
+    public JSONObject serialize(Object object) {
         final JSONObject json = new JSONObject();
         final ItemStack itemStack = (ItemStack) object;
 

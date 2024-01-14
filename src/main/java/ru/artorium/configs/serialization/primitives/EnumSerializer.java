@@ -1,17 +1,18 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import java.lang.reflect.Field;
+import ru.artorium.configs.serialization.GenericSerializer;
 
-public class EnumSerializer implements Serializer<Enum, String> {
+public class EnumSerializer implements GenericSerializer<Enum, String> {
 
     @Override
-    public Enum deserialize(Class<?> fieldClass, Object object) {
+    public Enum deserialize(Field field, Object object) {
         final String name = (String) object;
-        return Enum.valueOf((Class<Enum>) fieldClass, name);
+        return Enum.valueOf((Class<Enum>) field.getType(), name);
     }
 
     @Override
-    public String serialize(Class<?> fieldClass, Object object) {
+    public String serialize(Field field, Object object) {
         final Enum<?> value = (Enum<?>) object;
         return value.name();
     }

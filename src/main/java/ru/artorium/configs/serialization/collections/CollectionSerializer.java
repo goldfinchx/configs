@@ -1,41 +1,37 @@
 package ru.artorium.configs.serialization.collections;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.Utils;
+import ru.artorium.configs.serialization.GenericSerializer;
 
-public class CollectionSerializer implements Serializer<Collection, JSONObject> {
+public class CollectionSerializer implements GenericSerializer<Collection, JSONArray> {
 
     @Override
-    public JSONObject serialize(Class<?> fieldClass, Object object) {
-        final JSONObject json = new JSONObject();
-        final Collection collection = (Collection) object;
-        final Class<?> genericClass = ((Collection<?>) object).stream().findFirst().get().getClass();
+    public JSONArray serialize(Field field, Object object) {
         final JSONArray array = new JSONArray();
+        final Collection collection = (Collection) object;
+        final Class<?> genericClass = this.getGenericType(field);
 
-        collection.forEach(value -> array.add(Serializer.serialize(genericClass, genericClass, value)));
-        json.put("_type", genericClass.getTypeName());
-        json.put("values", array);
-
-
-        return json;
+        collection.forEach(value -> array.add(Utils.serializeSpecific(genericClass, value)));
+        return array;
     }
 
 
     @Override
-    public Collection deserialize(Class<?> fieldClass, Object object) {
-        final JSONObject json = (JSONObject) object;
-        final Class<?> genericClass;
-        try {
-            genericClass = Class.forName((String) json.get("_type"));
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public Collection deserialize(Field field, Object object) {
+        final JSONArray array = (JSONArray) object;
+        final Class<?> genericClass = this.getGenericType(field);
 
-        final JSONArray array = (JSONArray) json.get("values");
-        return new ArrayList(array.stream().map(val -> Serializer.deserialize(genericClass, genericClass, val)).toList());
+        return new ArrayList(array.stream().map(val -> Utils.deserializeSpecific(genericClass, val)).toList());
+    }
+
+    private Class<?> getGenericType(Field field) {
+        final ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+        return (Class<?>) parameterizedType.getActualTypeArguments()[0];
     }
 
 }

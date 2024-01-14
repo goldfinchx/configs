@@ -3,25 +3,26 @@ package ru.artorium.configs.serialization.collections;
 import java.util.Arrays;
 import java.util.List;
 import org.json.simple.JSONArray;
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.Utils;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class ArraySerializer implements Serializer<Object[], JSONArray> {
+public class ArraySerializer implements SimpleSerializer<Object[], JSONArray> {
 
     @Override
-    public Object[] deserialize(Class<?> fieldClass, Object object) {
+    public Object[] deserialize(Object object) {
         final JSONArray array = (JSONArray) object;
-        final Class<?> genericClass = fieldClass.getComponentType();
+        final Class<?> genericClass = object.getClass().getComponentType();
 
-        return array.stream().map(o -> Serializer.deserialize(genericClass, genericClass, o)).toArray();
+        return array.stream().map(value -> Utils.deserializeSpecific(genericClass, value)).toArray();
     }
 
     @Override
-    public JSONArray serialize(Class<?> fieldClass, Object object) {
+    public JSONArray serialize(Object object) {
         final JSONArray json = new JSONArray();
         final List<?> list = Arrays.asList((Object[]) object);
         final Class<?> genericClass = object.getClass().getComponentType();
 
-        list.forEach(value -> json.add(Serializer.serialize(genericClass, genericClass, value)));
+        list.forEach(value -> json.add(Utils.deserializeSpecific(genericClass, value)));
         return json;
     }
 

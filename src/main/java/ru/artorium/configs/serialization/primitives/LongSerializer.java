@@ -1,16 +1,16 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class LongSerializer implements Serializer<Long, Object> {
+public class LongSerializer implements SimpleSerializer<Long, Object> {
 
     @Override
-    public Long deserialize(Class<?> fieldClass, Object object) {
+    public Long deserialize(Object object) {
         return Long.parseLong((String) object);
     }
 
     @Override
-    public String serialize(Class<?> fieldClass, Object object) {
+    public String serialize(Object object) {
         return object.toString();
     }
 

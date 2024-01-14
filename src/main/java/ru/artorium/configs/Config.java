@@ -13,7 +13,6 @@ import ru.artorium.configs.annotations.Ignore;
 import ru.artorium.configs.formats.Format;
 import ru.artorium.configs.formats.JSON;
 import ru.artorium.configs.formats.YAML;
-import ru.artorium.configs.serialization.Serializer;
 
 @Getter
 @NoArgsConstructor
@@ -40,7 +39,7 @@ public abstract class Config {
 
         this.getFields(this).forEach(field -> {
             try {
-                field.set(this, Serializer.deserialize(field.getType(), field.getType(), this.map.get(field.getName())));
+                field.set(this, Utils.deserialize(field, this.map.get(field.getName())));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -65,7 +64,7 @@ public abstract class Config {
         this.getFields(this).forEach(field -> {
             this.map.computeIfAbsent(field.getName(), $ -> {
                 try {
-                    return Serializer.serialize(field.getType(), field.getType(), field.get(defaultConfig));
+                    return Utils.serialize(field, field.get(defaultConfig));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }

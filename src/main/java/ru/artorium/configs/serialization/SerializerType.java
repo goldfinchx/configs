@@ -1,5 +1,6 @@
 package ru.artorium.configs.serialization;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -27,10 +28,10 @@ import ru.artorium.configs.serialization.primitives.StringSerializer;
 @AllArgsConstructor
 public enum SerializerType {
     STRING(String.class, String.class, new StringSerializer()),
-    INTEGER(Integer.class, String.class, new IntegerSerializer()),
-    DOUBLE(Double.class, String.class, new DoubleSerializer()),
-    LONG(Long.class, String.class, new LongSerializer()),
-    FLOAT(Float.class, String.class, new FloatSerializer()),
+    INTEGER(int.class, String.class, new IntegerSerializer()),
+    DOUBLE(double.class, String.class, new DoubleSerializer()),
+    LONG(long.class, String.class, new LongSerializer()),
+    FLOAT(float.class, String.class, new FloatSerializer()),
     ENUM(Enum.class, String.class, new EnumSerializer(), true),
     ITEMSTACK(ItemStack.class, JSONObject.class, new ItemStackSerializer(), true),
     LOCATION(Location.class, JSONObject.class, new LocationSerializer(), true),
@@ -42,10 +43,10 @@ public enum SerializerType {
 
     private final Class<?> from;
     private final Class<?> to;
-    private final Serializer<?, ?> serializer;
+    private final Serializer serializer;
     private final boolean requireTypification;
 
-    SerializerType(Class<?> from, Class<?> to, Serializer<?, ?> serializer) {
+    SerializerType(Class<?> from, Class<?> to, Serializer serializer) {
         this.from = from;
         this.to = to;
         this.serializer = serializer;
@@ -74,7 +75,7 @@ public enum SerializerType {
         }
 
         final Class<?> finalFieldClass = fieldClass;
-        return java.util.Arrays.stream(SerializerType.values())
+        return Arrays.stream(SerializerType.values())
             .filter(type -> type.getFrom().equals(finalFieldClass))
             .findFirst()
             .orElse(SerializerType.OBJECT);

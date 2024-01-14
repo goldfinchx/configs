@@ -1,16 +1,16 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.SimpleSerializer;
 
-public class DoubleSerializer implements Serializer<Double, Object> {
+public class DoubleSerializer implements SimpleSerializer<Double, Object> {
 
     @Override
-    public Double deserialize(Class<?> fieldClass, Object object) {
+    public Double deserialize(Object object) {
         return Double.parseDouble((String) object);
     }
 
     @Override
-    public String serialize(Class<?> fieldClass, Object object) {
+    public String serialize(Object object) {
         return object.toString();
     }
 }
