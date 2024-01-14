@@ -32,7 +32,7 @@ public class MapSerializer implements GenericSerializer<Map, JSONObject> {
         final Class<?> valueType = genericTypes.getB();
         final Map map = new HashMap<>();
 
-        json.forEach((k, v) -> map.put(Utils.serializeSpecific(keyType, k), Utils.serializeSpecific(valueType, v)));
+        json.forEach((k, v) -> map.put(Utils.deserializeSpecific(keyType, k), Utils.deserializeSpecific(valueType, v)));
         return new HashMap(Collections.checkedMap(map, keyType, valueType));
     }
 

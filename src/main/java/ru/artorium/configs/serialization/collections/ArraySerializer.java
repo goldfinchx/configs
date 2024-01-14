@@ -22,7 +22,7 @@ public class ArraySerializer implements SpecificSerializer<Object[], JSONArray> 
         final List<?> list = Arrays.asList((Object[]) object);
         final Class<?> genericClass = object.getClass().getComponentType();
 
-        list.forEach(value -> json.add(Utils.deserializeSpecific(genericClass, value)));
+        list.forEach(value -> json.add(Utils.serializeSpecific(genericClass, value)));
         return json;
     }
 
