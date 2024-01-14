@@ -5,7 +5,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class IntegerSerializer implements SpecificSerializer<Integer, Object> {
 
     @Override
-    public Integer deserialize(Object object) {
+    public Integer deserialize(Class<?> fieldClass, Object object) {
         return Integer.parseInt((String) object);
     }
 

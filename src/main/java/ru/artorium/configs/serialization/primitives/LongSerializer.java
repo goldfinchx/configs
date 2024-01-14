@@ -5,7 +5,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class LongSerializer implements SpecificSerializer<Long, Object> {
 
     @Override
-    public Long deserialize(Object object) {
+    public Long deserialize(Class<?> fieldClass, Object object) {
         return Long.parseLong((String) object);
     }
 

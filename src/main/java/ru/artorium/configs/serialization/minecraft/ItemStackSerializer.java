@@ -14,7 +14,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONObject> {
 
     @Override
-    public ItemStack deserialize(Object object) {
+    public ItemStack deserialize(Class<?> fieldClass, Object object) {
         final JSONObject json = (JSONObject) object;
         final ItemStack itemStack = new ItemStack(Material.valueOf((String) json.get("type")), (int) (long) json.get("amount"));
         final ItemMeta itemMeta = itemStack.getItemMeta();

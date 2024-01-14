@@ -9,7 +9,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class ArraySerializer implements SpecificSerializer<Object[], JSONArray> {
 
     @Override
-    public Object[] deserialize(Object object) {
+    public Object[] deserialize(Class<?> fieldClass, Object object) {
         final JSONArray array = (JSONArray) object;
         final Class<?> genericClass = object.getClass().getComponentType();
 

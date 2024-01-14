@@ -5,7 +5,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class FloatSerializer implements SpecificSerializer<Float, Object> {
 
     @Override
-    public Float deserialize(Object object) {
+    public Float deserialize(Class<?> fieldClass, Object object) {
         return Float.parseFloat((String) object);
     }
 

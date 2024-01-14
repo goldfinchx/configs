@@ -8,7 +8,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class LocationSerializer implements SpecificSerializer<Location, JSONObject> {
 
     @Override
-    public Location deserialize(Object object) {
+    public Location deserialize(Class<?> fieldClass, Object object) {
         final JSONObject json = (JSONObject) object;
         final Location location = new Location(null, 0, 0, 0);
 

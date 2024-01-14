@@ -7,7 +7,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class ComponentSerializer implements SpecificSerializer<Component, String> {
 
     @Override
-    public Component deserialize(Object object) {
+    public Component deserialize(Class<?> fieldClass, Object object) {
         return MiniMessage.miniMessage().deserialize((String) object);
     }
 

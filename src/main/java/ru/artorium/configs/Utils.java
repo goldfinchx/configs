@@ -26,7 +26,7 @@ public class Utils {
         return ((SpecificSerializer) SerializerType.getByClass(clazz).getSerializer()).serialize(object);
     }
     public static Object deserializeSpecific(Class<?> clazz, Object object) {
-        return ((SpecificSerializer) SerializerType.getByClass(clazz).getSerializer()).deserialize(object);
+        return ((SpecificSerializer) SerializerType.getByClass(clazz).getSerializer()).deserialize(clazz, object);
     }
 
     private static boolean isGeneric(Class<?> fieldClass) {

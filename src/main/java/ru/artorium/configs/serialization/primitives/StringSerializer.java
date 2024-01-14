@@ -5,7 +5,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class StringSerializer implements SpecificSerializer<String, Object> {
 
     @Override
-    public String deserialize(Object object) {
+    public String deserialize(Class<?> fieldClass, Object object) {
         return ((String) object);
     }
 

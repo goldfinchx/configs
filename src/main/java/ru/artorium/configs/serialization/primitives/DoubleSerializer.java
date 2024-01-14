@@ -5,7 +5,7 @@ import ru.artorium.configs.serialization.SpecificSerializer;
 public class DoubleSerializer implements SpecificSerializer<Double, Object> {
 
     @Override
-    public Double deserialize(Object object) {
+    public Double deserialize(Class<?> fieldClass, Object object) {
         return Double.parseDouble((String) object);
     }
 
