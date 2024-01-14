@@ -9,9 +9,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class ItemStackSerializer implements SimpleSerializer<ItemStack, JSONObject> {
+public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONObject> {
 
     @Override
     public ItemStack deserialize(Object object) {

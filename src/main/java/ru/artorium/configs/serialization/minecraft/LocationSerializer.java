@@ -3,9 +3,9 @@ package ru.artorium.configs.serialization.minecraft;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class LocationSerializer implements SimpleSerializer<Location, JSONObject> {
+public class LocationSerializer implements SpecificSerializer<Location, JSONObject> {
 
     @Override
     public Location deserialize(Object object) {

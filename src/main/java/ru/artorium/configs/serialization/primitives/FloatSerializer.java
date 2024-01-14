@@ -1,8 +1,8 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class FloatSerializer implements SimpleSerializer<Float, Object> {
+public class FloatSerializer implements SpecificSerializer<Float, Object> {
 
     @Override
     public Float deserialize(Object object) {

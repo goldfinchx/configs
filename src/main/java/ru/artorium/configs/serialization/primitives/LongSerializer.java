@@ -1,8 +1,8 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class LongSerializer implements SimpleSerializer<Long, Object> {
+public class LongSerializer implements SpecificSerializer<Long, Object> {
 
     @Override
     public Long deserialize(Object object) {

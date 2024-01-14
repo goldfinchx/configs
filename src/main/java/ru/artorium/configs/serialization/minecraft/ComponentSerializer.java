@@ -2,9 +2,9 @@ package ru.artorium.configs.serialization.minecraft;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class ComponentSerializer implements SimpleSerializer<Component, String> {
+public class ComponentSerializer implements SpecificSerializer<Component, String> {
 
     @Override
     public Component deserialize(Object object) {

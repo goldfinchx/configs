@@ -1,8 +1,8 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class IntegerSerializer implements SimpleSerializer<Integer, Object> {
+public class IntegerSerializer implements SpecificSerializer<Integer, Object> {
 
     @Override
     public Integer deserialize(Object object) {

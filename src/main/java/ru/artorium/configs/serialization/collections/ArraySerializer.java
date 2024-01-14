@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.json.simple.JSONArray;
 import ru.artorium.configs.Utils;
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class ArraySerializer implements SimpleSerializer<Object[], JSONArray> {
+public class ArraySerializer implements SpecificSerializer<Object[], JSONArray> {
 
     @Override
     public Object[] deserialize(Object object) {

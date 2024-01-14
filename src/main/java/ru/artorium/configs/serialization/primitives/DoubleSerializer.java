@@ -1,8 +1,8 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.SimpleSerializer;
+import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class DoubleSerializer implements SimpleSerializer<Double, Object> {
+public class DoubleSerializer implements SpecificSerializer<Double, Object> {
 
     @Override
     public Double deserialize(Object object) {
