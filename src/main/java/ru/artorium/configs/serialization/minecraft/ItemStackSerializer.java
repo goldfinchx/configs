@@ -1,5 +1,6 @@
 package ru.artorium.configs.serialization.minecraft;
 
+import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
@@ -15,30 +16,33 @@ public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONOb
 
     @Override
     public ItemStack deserialize(Class<?> fieldClass, Object object) {
-        final JSONObject json = (JSONObject) object;
-        final ItemStack itemStack = new ItemStack(Material.valueOf((String) json.get("type")), (int) (long) json.get("amount"));
+        final Map<String, Object> map = (Map) object;
+        final ItemStack itemStack = new ItemStack(Material.valueOf((String) map.get("type")), ((Number) map.get("amount")).intValue());
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
-        if (json.containsKey("displayName")) {
-            itemMeta.displayName(Component.text((String) json.get("displayName")));
+        if (map.containsKey("displayName")) {
+            itemMeta.displayName(Component.text((String) map.get("displayName")));
         }
 
-        if (json.containsKey("lore")) {
-            final JSONArray lore = (JSONArray) json.get("lore");
+        if (map.containsKey("lore")) {
+            final JSONArray lore = (JSONArray) map.get("lore");
             itemMeta.lore(lore.stream().map(component -> Component.text((String) component)).toList());
         }
 
-        if (json.containsKey("customModelData")) {
-            itemMeta.setCustomModelData((int) (long) json.get("customModelData"));
+        if (map.containsKey("customModelData")) {
+            itemMeta.setCustomModelData(((Number) map.get("customModelData")).intValue());
         }
 
-        if (json.containsKey("enchantments")) {
-            final JSONObject enchantments = (JSONObject) json.get("enchantments");
-            enchantments.forEach((enchantment, level) -> itemStack.addUnsafeEnchantment(Enchantment.getByName((String) enchantment), (int) (long) level));
+        if (map.containsKey("enchantments")) {
+            final JSONObject enchantments = (JSONObject) map.get("enchantments");
+            enchantments.forEach((enchantment, level) -> itemStack.addUnsafeEnchantment(
+                Enchantment.getByName((String) enchantment),
+                ((Number) level).intValue())
+            );
         }
 
-        if (json.containsKey("itemFlags")) {
-            final JSONArray itemFlags = (JSONArray) json.get("itemFlags");
+        if (map.containsKey("itemFlags")) {
+            final JSONArray itemFlags = (JSONArray) map.get("itemFlags");
             itemFlags.forEach(itemFlag -> itemMeta.addItemFlags(ItemFlag.valueOf((String) itemFlag)));
         }
 

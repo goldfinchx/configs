@@ -3,26 +3,18 @@ package ru.artorium.configs.serialization.primitives;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.json.simple.JSONObject;
 import ru.artorium.configs.Utils;
 import ru.artorium.configs.annotations.Ignore;
-import ru.artorium.configs.serialization.GenericSerializer;
 import ru.artorium.configs.serialization.SpecificSerializer;
 
 public class ObjectSerializer implements SpecificSerializer<Object, JSONObject> {
 
     @Override
     public Object deserialize(Class<?> classField, Object object) {
-        final JSONObject json;
-
-        if (object instanceof LinkedHashMap<?,?>) {
-            json = new JSONObject((LinkedHashMap<?,?>) object);
-        } else {
-            json = (JSONObject) object;
-        }
-
+        final Map<String, Object> map = (Map) object;
         final Object instance;
 
         try {
@@ -33,7 +25,7 @@ public class ObjectSerializer implements SpecificSerializer<Object, JSONObject> 
 
         this.getFields(instance).forEach(objectField -> {
             try {
-                objectField.set(instance, Utils.deserialize(objectField, json.get(objectField.getName())));
+                objectField.set(instance, Utils.deserialize(objectField, map.get(objectField.getName())));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

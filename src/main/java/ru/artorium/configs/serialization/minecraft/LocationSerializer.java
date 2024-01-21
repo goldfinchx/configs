@@ -1,5 +1,6 @@
 package ru.artorium.configs.serialization.minecraft;
 
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
@@ -9,19 +10,19 @@ public class LocationSerializer implements SpecificSerializer<Location, JSONObje
 
     @Override
     public Location deserialize(Class<?> fieldClass, Object object) {
-        final JSONObject json = (JSONObject) object;
+        final Map<String, Object> map = (Map) object;
         final Location location = new Location(null, 0, 0, 0);
 
-        location.setWorld(Bukkit.getWorld((String) json.get("world")));
-        location.setX((double) json.get("x"));
-        location.setY((double) json.get("y"));
-        location.setZ((double) json.get("z"));
+        location.setWorld(Bukkit.getWorld((String) map.get("world")));
+        location.setX(((Number) map.get("x")).floatValue());
+        location.setY(((Number) map.get("y")).floatValue());
+        location.setZ(((Number) map.get("z")).floatValue());
 
-        if (json.containsKey("yaw")) {
-            location.setYaw((float) (double) json.get("yaw"));
+        if (map.containsKey("yaw")) {
+            location.setYaw(((Number) map.get("yaw")).floatValue());
         }
-        if (json.containsKey("pitch")) {
-            location.setPitch((float) (double) json.get("pitch"));
+        if (map.containsKey("pitch")) {
+            location.setPitch(((Number) map.get("pitch")).floatValue());
         }
 
         return location;
