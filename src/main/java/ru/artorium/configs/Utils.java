@@ -1,6 +1,9 @@
 package ru.artorium.configs;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Map;
+import net.kyori.adventure.text.Component;
 import ru.artorium.configs.serialization.GenericSerializer;
 import ru.artorium.configs.serialization.SerializerType;
 import ru.artorium.configs.serialization.SpecificSerializer;
@@ -40,4 +43,40 @@ public class Utils {
         return ((GenericSerializer) SerializerType.getByClass(targetClass).getSerializer()).serialize(field, object);
     }
 
+    public static Class<?> getActualClass(Class<?> fieldClass) {
+
+        if (fieldClass.isEnum()) {
+            return Enum.class;
+        }
+
+        if (Collection.class.isAssignableFrom(fieldClass)) {
+            return Collection.class;
+        }
+
+        if (Map.class.isAssignableFrom(fieldClass)) {
+            return Map.class;
+        }
+
+        if (Component.class.isAssignableFrom(fieldClass)) {
+            fieldClass = Component.class;
+        }
+
+        if (fieldClass.isArray()) {
+            return Object[].class;
+        }
+
+        if (Number.class.isAssignableFrom(fieldClass)) {
+            if (fieldClass == Integer.class) {
+                return int.class;
+            } else if (fieldClass == Double.class) {
+                return double.class;
+            } else if (fieldClass == Long.class) {
+                return long.class;
+            } else if (fieldClass == Float.class) {
+                return float.class;
+            }
+        }
+
+        return fieldClass;
+    }
 }

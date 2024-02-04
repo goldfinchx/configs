@@ -1,10 +1,11 @@
-package ru.artorium.configs.serialization.primitives;
+package ru.artorium.configs.serialization.other;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.simple.JSONObject;
 import ru.artorium.configs.Utils;
 import ru.artorium.configs.annotations.Ignore;
@@ -50,10 +51,11 @@ public class ObjectSerializer implements SpecificSerializer<Object, JSONObject> 
     }
 
     private List<Field> getFields(Object object) {
-        return Arrays.stream(object.getClass().getDeclaredFields())
+        return FieldUtils.getAllFieldsList(object.getClass()).stream()
             .filter(field -> !field.isAnnotationPresent(Ignore.class))
             .peek(field -> field.setAccessible(true))
-            .toList();
+            .collect(Collectors.toList());
+
     }
 
 }

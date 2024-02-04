@@ -1,4 +1,4 @@
-package ru.artorium.configs.serialization.primitives;
+package ru.artorium.configs.serialization.other;
 
 import ru.artorium.configs.serialization.SpecificSerializer;
 

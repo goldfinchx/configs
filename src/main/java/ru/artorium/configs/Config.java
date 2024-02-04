@@ -7,8 +7,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.artorium.configs.annotations.Ignore;
 import ru.artorium.configs.formats.Format;
 import ru.artorium.configs.formats.JSON;
@@ -18,9 +20,9 @@ import ru.artorium.configs.formats.YAML;
 @NoArgsConstructor
 public abstract class Config {
 
-    private Map<String, Object> map;
-    private File file;
-    private Format format;
+    @Ignore private Map<String, Object> map;
+    @Ignore private File file;
+    @Ignore private Format format;
 
     public Config(String fileName, String path) {
         this.file = new File(path, fileName);
@@ -85,10 +87,10 @@ public abstract class Config {
     }
 
     private List<Field> getFields(Object object) {
-        return Arrays.stream(object.getClass().getDeclaredFields())
+        return Arrays.stream(FieldUtils.getAllFields(object.getClass()))
             .filter(field -> !field.isAnnotationPresent(Ignore.class))
             .peek(field -> field.setAccessible(true))
-            .toList();
+            .collect(Collectors.toList());
     }
 
 }
