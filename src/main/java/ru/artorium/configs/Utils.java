@@ -44,7 +44,6 @@ public class Utils {
     }
 
     public static Class<?> getActualClass(Class<?> fieldClass) {
-
         if (fieldClass.isEnum()) {
             return Enum.class;
         }
@@ -63,6 +62,10 @@ public class Utils {
 
         if (fieldClass.isArray()) {
             return Object[].class;
+        }
+
+        if (Boolean.class.isAssignableFrom(fieldClass)) {
+            return boolean.class;
         }
 
         if (Number.class.isAssignableFrom(fieldClass)) {

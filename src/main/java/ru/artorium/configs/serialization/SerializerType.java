@@ -21,6 +21,7 @@ import ru.artorium.configs.serialization.minecraft.LocationSerializer;
 import ru.artorium.configs.serialization.minecraft.WorldSerializer;
 import ru.artorium.configs.serialization.other.EnumSerializer;
 import ru.artorium.configs.serialization.other.ObjectSerializer;
+import ru.artorium.configs.serialization.primitives.BooleanSerializer;
 import ru.artorium.configs.serialization.primitives.DoubleSerializer;
 import ru.artorium.configs.serialization.primitives.FloatSerializer;
 import ru.artorium.configs.serialization.primitives.IntegerSerializer;
@@ -34,6 +35,7 @@ public enum SerializerType {
     INTEGER(int.class, String.class, new IntegerSerializer()),
     DOUBLE(double.class, String.class, new DoubleSerializer()),
     LONG(long.class, String.class, new LongSerializer()),
+    BOOLEAN(boolean.class, String.class, new BooleanSerializer()),
     FLOAT(float.class, String.class, new FloatSerializer()),
     ENUM(Enum.class, String.class, new EnumSerializer()),
     ITEMSTACK(ItemStack.class, JSONObject.class, new ItemStackSerializer()),
