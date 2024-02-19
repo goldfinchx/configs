@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +14,6 @@ import ru.artorium.configs.Utils;
 import ru.artorium.configs.serialization.collections.ArraySerializer;
 import ru.artorium.configs.serialization.collections.CollectionSerializer;
 import ru.artorium.configs.serialization.collections.MapSerializer;
-import ru.artorium.configs.serialization.minecraft.ComponentSerializer;
 import ru.artorium.configs.serialization.minecraft.ItemStackSerializer;
 import ru.artorium.configs.serialization.minecraft.LocationSerializer;
 import ru.artorium.configs.serialization.minecraft.WorldSerializer;
@@ -41,7 +39,6 @@ public enum SerializerType {
     ITEMSTACK(ItemStack.class, JSONObject.class, new ItemStackSerializer()),
     LOCATION(Location.class, JSONObject.class, new LocationSerializer()),
     WORLD(World.class, String.class, new WorldSerializer()),
-    COMPONENT(Component.class, String.class, new ComponentSerializer()),
     MAP(Map.class, JSONObject.class, new MapSerializer()),
     COLLECTION(Collection.class, JSONArray.class, new CollectionSerializer()),
     ARRAY(Object[].class, JSONArray.class, new ArraySerializer()),

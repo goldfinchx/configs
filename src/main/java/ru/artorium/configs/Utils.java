@@ -3,7 +3,6 @@ package ru.artorium.configs;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
-import net.kyori.adventure.text.Component;
 import ru.artorium.configs.serialization.GenericSerializer;
 import ru.artorium.configs.serialization.SerializerType;
 import ru.artorium.configs.serialization.SpecificSerializer;
@@ -54,10 +53,6 @@ public class Utils {
 
         if (Map.class.isAssignableFrom(fieldClass)) {
             return Map.class;
-        }
-
-        if (Component.class.isAssignableFrom(fieldClass)) {
-            fieldClass = Component.class;
         }
 
         if (fieldClass.isArray()) {

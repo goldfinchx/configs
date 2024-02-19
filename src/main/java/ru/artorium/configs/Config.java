@@ -38,7 +38,6 @@ public abstract class Config {
         }
 
         this.fillMissingFields();
-
         this.getFields(this).forEach(field -> {
             try {
                 field.set(this, Utils.deserialize(field, this.map.get(field.getName())));
@@ -62,7 +61,6 @@ public abstract class Config {
 
     private void fillMissingFields() {
         final Config defaultConfig = this.getTemplate();
-
         this.getFields(this).forEach(field -> {
             this.map.computeIfAbsent(field.getName(), $ -> {
                 try {

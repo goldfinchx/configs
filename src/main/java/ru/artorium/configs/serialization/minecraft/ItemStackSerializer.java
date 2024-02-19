@@ -1,8 +1,7 @@
 package ru.artorium.configs.serialization.minecraft;
 
 import java.util.Map;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -21,12 +20,12 @@ public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONOb
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (map.containsKey("displayName")) {
-            itemMeta.displayName(Component.text((String) map.get("displayName")));
+            itemMeta.setDisplayName((String) map.get("displayName"));
         }
 
         if (map.containsKey("lore")) {
             final JSONArray lore = (JSONArray) map.get("lore");
-            itemMeta.lore(lore.stream().map(component -> Component.text((String) component)).toList());
+            itemMeta.setLore(lore.stream().map(String.class::cast).toList());
         }
 
         if (map.containsKey("customModelData")) {
@@ -59,11 +58,11 @@ public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONOb
         json.put("amount", itemStack.getAmount());
 
         if (itemStack.getItemMeta().hasDisplayName()) {
-            json.put("displayName", PlainTextComponentSerializer.plainText().serialize(itemStack.getItemMeta().displayName()));
+            json.put("displayName", itemStack.getItemMeta().getDisplayName());
         }
         if (itemStack.getItemMeta().hasLore()) {
             final JSONArray lore = new JSONArray();
-            itemStack.lore().forEach(component -> lore.add(PlainTextComponentSerializer.plainText().serialize(component)));
+            lore.addAll(Objects.requireNonNull(itemStack.getItemMeta().getLore()));
             json.put("lore", lore);
         }
         if (itemStack.getItemMeta().hasCustomModelData()) {
@@ -75,11 +74,6 @@ public class ItemStackSerializer implements SpecificSerializer<ItemStack, JSONOb
             json.put("enchantments", enchantments);
         }
 
-        if (!itemStack.getItemFlags().isEmpty()) {
-            final JSONArray itemFlags = new JSONArray();
-            itemStack.getItemFlags().forEach(itemFlag -> itemFlags.add(itemFlag.name()));
-            json.put("itemFlags", itemFlags);
-        }
 
         return json;
     }

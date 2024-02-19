@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'io.freefair.lombok' version '8.4'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'io.papermc.paperweight.userdev' version '1.5.5'
 }
 
 group 'ru.artorium.configs'
@@ -10,11 +9,18 @@ version '1.0.1'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+
+    maven {
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
 }
 
 dependencies {
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20-R0.1-SNAPSHOT")
+    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.0'
     implementation 'org.yaml:snakeyaml:2.0'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
 }
