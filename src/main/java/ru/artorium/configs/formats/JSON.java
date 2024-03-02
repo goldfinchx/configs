@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,11 +31,11 @@ public class JSON implements Format {
         final JSONParser parser = new JSONParser();
 
         if (file.length() == 0) {
-            return new JSONObject();
+            return new HashMap<>();
         }
 
         try {
-            return (JSONObject) parser.parse(new FileReader(file, StandardCharsets.UTF_8));
+            return new LinkedHashMap<>((JSONObject) parser.parse(new FileReader(file, StandardCharsets.UTF_8)));
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }

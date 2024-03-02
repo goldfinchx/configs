@@ -1,19 +1,26 @@
 package ru.artorium.configs.serialization.minecraft;
 
+import ru.artorium.configs.serialization.Serializer.Specific;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import ru.artorium.configs.serialization.SpecificSerializer;
 
-public class WorldSerializer implements SpecificSerializer<World, String> {
+public class WorldSerializer implements Specific<World, String> {
 
     @Override
-    public World deserialize(Class<?> fieldClass, Object object) {
-        return Bukkit.getWorld((String) object);
+    public World deserialize(Class<?> fieldClass, String serialized) {
+        final World world = Bukkit.getWorld(serialized);
+
+        if (world == null) {
+            throw new IllegalArgumentException("Failed to deserialize world with name " + serialized + " as it does not exist");
+        }
+
+        return world;
     }
 
     @Override
-    public String serialize(Object object) {
-        return ((World) object).getName();
+    public String serialize(World world) {
+        return world.getName();
     }
+
 
 }

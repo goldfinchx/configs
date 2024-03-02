@@ -1,18 +1,17 @@
 package ru.artorium.configs.serialization.primitives;
 
 
-import ru.artorium.configs.serialization.SpecificSerializer;
+import ru.artorium.configs.serialization.Serializer;
 
-public class StringSerializer implements SpecificSerializer<String, Object> {
+public class StringSerializer implements Serializer.Specific<String, String> {
 
     @Override
-    public String deserialize(Class<?> fieldClass, Object object) {
-        return ((String) object);
+    public String deserialize(Class<?> fieldClass, String serialized) {
+        return serialized;
     }
 
     @Override
-    public String serialize(Object object) {
-        return object.toString();
+    public String serialize(String object) {
+        return object;
     }
-
 }

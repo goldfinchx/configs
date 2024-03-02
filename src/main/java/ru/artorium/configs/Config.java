@@ -1,34 +1,31 @@
 package ru.artorium.configs;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import ru.artorium.configs.annotations.Ignore;
 import ru.artorium.configs.formats.Format;
 import ru.artorium.configs.formats.JSON;
 import ru.artorium.configs.formats.YAML;
+import ru.artorium.configs.serialization.Serializer;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 public abstract class Config {
 
-    @Ignore private Map<String, Object> map;
     @Ignore private File file;
     @Ignore private Format format;
+    @Ignore private LinkedHashMap<String, Object> map;
 
     public Config(String fileName, String path) {
         this.file = new File(path, fileName);
         this.format = fileName.endsWith(".yaml") || fileName.endsWith(".yml") ? new YAML() : new JSON();
-        this.map = this.format.readFile(this.file);
-
+        this.map = new LinkedHashMap<>(this.format.readFile(this.file));
+        
         this.reload();
     }
 
@@ -38,14 +35,7 @@ public abstract class Config {
         }
 
         this.fillMissingFields();
-
-        this.getFields(this).forEach(field -> {
-            try {
-                field.set(this, Utils.deserialize(field, this.map.get(field.getName())));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Serializer.OBJECT.deserialize(this.getClass(), this.map);
     }
 
     private void createFile() {
@@ -61,19 +51,8 @@ public abstract class Config {
     }
 
     private void fillMissingFields() {
-        final Config defaultConfig = this.getTemplate();
-
-        this.getFields(this).forEach(field -> {
-            this.map.computeIfAbsent(field.getName(), $ -> {
-                try {
-                    return Utils.serialize(field, field.get(defaultConfig));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-        });
-
+        final Map<String, Object> serialized = (LinkedHashMap<String, Object>) Serializer.OBJECT.serialize(this.getTemplate());
+        serialized.forEach((key, value) -> this.map.putIfAbsent(key, value));
         this.format.writeFile(this.file, this.map);
     }
 
@@ -85,12 +64,4 @@ public abstract class Config {
             throw new RuntimeException(e);
         }
     }
-
-    private List<Field> getFields(Object object) {
-        return Arrays.stream(FieldUtils.getAllFields(object.getClass()))
-            .filter(field -> !field.isAnnotationPresent(Ignore.class))
-            .peek(field -> field.setAccessible(true))
-            .collect(Collectors.toList());
-    }
-
 }
