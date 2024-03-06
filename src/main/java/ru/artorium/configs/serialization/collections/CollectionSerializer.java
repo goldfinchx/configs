@@ -1,33 +1,27 @@
 package ru.artorium.configs.serialization.collections;
 
+import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
-import ru.artorium.configs.serialization.Serializer.Generic;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.json.simple.JSONArray;
 
-public class CollectionSerializer implements Generic<Collection<?>, Collection<?>> {
+public class CollectionSerializer implements Serializer<Collection<?>, Collection<?>> {
 
     @Override
-    public Collection<?> serialize(Field field, Collection<?> collection) {
-        final Class<?> genericClass = this.getGenericType(field);
+    public Collection<?> serialize(TypeReference typeReference, Collection<?> collection) {
+        final Class<?> type = this.getGenericTypes(typeReference)[0];
         final JSONArray array = new JSONArray();
-        collection.forEach(value -> array.add(Serializer.serialize(genericClass, value)));
+        collection.forEach(value -> array.add(Serializer.serialize(this, new TypeReference(type), value)));
         return array;
     }
 
     @Override
-    public Collection<?> deserialize(Field field, Collection<?> serialized) {
-        final Class<?> genericClass = this.getGenericType(field);
-        return new ArrayList(serialized.stream().map(val -> Serializer.deserialize(genericClass, val)).toList());
+    public Collection<?> deserialize(TypeReference typeReference, Collection<?> serialized) {
+        final Class<?> type = this.getGenericTypes(typeReference)[0];
+        return new ArrayList(serialized.stream().map(val -> Serializer.deserialize(this, new TypeReference(type), val)).toList());
     }
 
-    private Class<?> getGenericType(Field field) {
-        final ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-        return (Class<?>) parameterizedType.getActualTypeArguments()[0];
-    }
 
     @Override
     public boolean isCompatibleWith(Class clazz) {

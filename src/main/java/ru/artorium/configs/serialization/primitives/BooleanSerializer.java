@@ -1,17 +1,18 @@
 package ru.artorium.configs.serialization.primitives;
 
 
+import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
 
-public class BooleanSerializer implements Serializer.Specific<Boolean, Boolean> {
+public class BooleanSerializer implements Serializer<Boolean, Boolean> {
 
     @Override
-    public Boolean deserialize(Class fieldClass, Boolean serialized) {
+    public Boolean deserialize(TypeReference typeReference, Boolean serialized) {
         return serialized;
     }
 
     @Override
-    public Boolean serialize(Boolean object) {
+    public Boolean serialize(TypeReference typeReference, Boolean object) {
         return object;
     }
 

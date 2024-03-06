@@ -1,16 +1,17 @@
 package ru.artorium.configs.serialization.primitives;
 
-import ru.artorium.configs.serialization.Serializer.Specific;
+import ru.artorium.configs.serialization.TypeReference;
+import ru.artorium.configs.serialization.Serializer;
 
-public class LongSerializer implements Specific<Long, Long> {
+public class LongSerializer implements Serializer<Long, Long> {
 
     @Override
-    public Long deserialize(Class fieldClass, Long serialized) {
+    public Long deserialize(TypeReference typeReference, Long serialized) {
         return serialized;
     }
 
     @Override
-    public Long serialize(Long object) {
+    public Long serialize(TypeReference typeReference, Long object) {
         return object;
     }
 

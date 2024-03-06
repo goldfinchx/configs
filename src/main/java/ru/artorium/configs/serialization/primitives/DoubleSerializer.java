@@ -1,16 +1,17 @@
 package ru.artorium.configs.serialization.primitives;
 
+import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
 
-public class DoubleSerializer implements Serializer.Specific<Double, Double> {
+public class DoubleSerializer implements Serializer<Double, Double> {
 
     @Override
-    public Double deserialize(Class fieldClass, Double serialized) {
+    public Double deserialize(TypeReference typeReference, Double serialized) {
         return serialized;
     }
 
     @Override
-    public Double serialize(Double object) {
+    public Double serialize(TypeReference typeReference, Double object) {
         return object;
     }
 

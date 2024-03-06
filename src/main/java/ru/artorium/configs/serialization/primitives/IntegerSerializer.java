@@ -1,16 +1,17 @@
 package ru.artorium.configs.serialization.primitives;
 
+import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
 
-public class IntegerSerializer implements Serializer.Specific<Integer, Integer> {
+public class IntegerSerializer implements Serializer<Integer, Integer> {
 
     @Override
-    public Integer deserialize(Class fieldClass, Integer serialized) {
+    public Integer deserialize(TypeReference typeReference, Integer serialized) {
         return serialized;
     }
 
     @Override
-    public Integer serialize(Integer object) {
+    public Integer serialize(TypeReference typeReference, Integer object) {
         return object;
     }
 

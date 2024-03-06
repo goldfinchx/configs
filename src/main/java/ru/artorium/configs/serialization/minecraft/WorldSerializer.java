@@ -1,13 +1,15 @@
 package ru.artorium.configs.serialization.minecraft;
 
-import ru.artorium.configs.serialization.Serializer.Specific;
+import ru.artorium.configs.serialization.TypeReference;
+import ru.artorium.configs.serialization.Serializer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-public class WorldSerializer implements Specific<World, String> {
+public class WorldSerializer implements Serializer<World, String> {
 
     @Override
-    public World deserialize(Class<?> fieldClass, String serialized) {
+    public World deserialize(TypeReference typeReference, String serialized) {
         final World world = Bukkit.getWorld(serialized);
 
         if (world == null) {
@@ -18,7 +20,7 @@ public class WorldSerializer implements Specific<World, String> {
     }
 
     @Override
-    public String serialize(World world) {
+    public String serialize(TypeReference typeReference, World world) {
         return world.getName();
     }
 
