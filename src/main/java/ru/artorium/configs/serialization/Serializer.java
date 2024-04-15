@@ -1,8 +1,13 @@
 package ru.artorium.configs.serialization;
 
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.util.Set;
+import org.apache.commons.lang.SerializationException;
 import ru.artorium.configs.serialization.collections.ArraySerializer;
 import ru.artorium.configs.serialization.collections.CollectionSerializer;
 import ru.artorium.configs.serialization.collections.MapSerializer;
+import ru.artorium.configs.serialization.minecraft.ComponentSerializer;
 import ru.artorium.configs.serialization.minecraft.ItemStackSerializer;
 import ru.artorium.configs.serialization.minecraft.LocationSerializer;
 import ru.artorium.configs.serialization.minecraft.WorldSerializer;
@@ -13,98 +18,58 @@ import ru.artorium.configs.serialization.primitives.DoubleSerializer;
 import ru.artorium.configs.serialization.primitives.IntegerSerializer;
 import ru.artorium.configs.serialization.primitives.LongSerializer;
 import ru.artorium.configs.serialization.primitives.StringSerializer;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.Set;
 
-public interface Serializer<T, R> {
+public interface Serializer<T, R> extends Serializable {
 
-    Specific STRING = new StringSerializer();
-    Specific INTEGER = new IntegerSerializer();
-    Specific DOUBLE = new DoubleSerializer();
-    Specific LONG = new LongSerializer();
-    Specific BOOLEAN = new BooleanSerializer();
-    Specific ENUM = new EnumSerializer();
-    Specific WORLD = new WorldSerializer();
-    Specific ITEMSTACK = new ItemStackSerializer();
-    Specific LOCATION = new LocationSerializer();
-    Generic COLLECTION = new CollectionSerializer();
-    Generic MAP = new MapSerializer();
-    Specific ARRAY = new ArraySerializer();
-    Specific OBJECT = new ObjectSerializer();
-
-
+    StringSerializer STRING = new StringSerializer();
+    IntegerSerializer INTEGER = new IntegerSerializer();
+    DoubleSerializer DOUBLE = new DoubleSerializer();
+    LongSerializer LONG = new LongSerializer();
+    BooleanSerializer BOOLEAN = new BooleanSerializer();
+    EnumSerializer ENUM = new EnumSerializer();
+    WorldSerializer WORLD = new WorldSerializer();
+    ItemStackSerializer ITEMSTACK = new ItemStackSerializer();
+    LocationSerializer LOCATION = new LocationSerializer();
+    CollectionSerializer COLLECTION = new CollectionSerializer();
+    ComponentSerializer COMPONENT = new ComponentSerializer();
+    MapSerializer MAP = new MapSerializer();
+    ArraySerializer ARRAY = new ArraySerializer();
+    ObjectSerializer OBJECT = new ObjectSerializer();
     Set<Serializer> ALL = Set.of(
         STRING, INTEGER, DOUBLE, LONG, BOOLEAN,
-        ENUM, WORLD, ITEMSTACK, LOCATION,
+        ENUM, WORLD, ITEMSTACK, LOCATION, COMPONENT,
         COLLECTION, MAP, ARRAY, OBJECT
     );
 
-    static Serializer getByClass(Class<?> targetClass) {
+
+    static Serializer getByClass(Class<?> clazz) {
         return ALL.stream()
-            .filter(type -> type.isCompatibleWith(targetClass))
+            .filter(type -> type.isCompatibleWith(clazz))
             .findFirst()
             .orElse(OBJECT);
     }
 
+    static Object deserialize(Class<?> targetClass, Object serialized) {
+        final Serializer serializer = getByClass(targetClass);
 
-    /**
-     * Serializes the given object. Handles generic types.
-     *
-     * @param field  The field of the object that needs to be serialized.
-     * @param object The object that needs to be serialized.
-     * @return The serialized object.
-     */
-    static Object serialize(Field field, Object object) {
-        final Serializer serializer = Serializer.getByClass(field.getType());
-        final boolean isGeneric = serializer instanceof Serializer.Generic;
-
-        if (isGeneric) {
-            return ((Generic) serializer).serialize(field, object);
-        } else {
-            return ((Specific) serializer).serialize(object);
+        try {
+            return serializer.deserialize(new TypeReference(targetClass), serialized);
+        } catch (Exception exception) {
+            throw new RuntimeException("Error while deserializing object of type " + serialized.getClass().getSimpleName() + " with contents: " + serialized,
+                exception);
         }
     }
 
-    /**
-     * Deserializes the given object. Handles generic types.
-     *
-     * @param field  The field of the object that needs to be deserialized.
-     * @param object The object that needs to be deserialized.
-     * @return The deserialized object.
-     */
-    static Object deserialize(Field field, Object object) {
-        final Serializer serializer = Serializer.getByClass(field.getType());
-        final boolean isGeneric = serializer instanceof Serializer.Generic;
+    static Object serialize(Class<?> targetClass, Object serialized) {
+        final Serializer serializer = getByClass(targetClass);
 
-        if (isGeneric) {
-            return ((Generic) serializer).deserialize(field, object);
-        } else {
-            return ((Specific) serializer).deserialize(field.getType(), object);
+        try {
+            return serializer.serialize(new TypeReference(targetClass), serialized);
+        } catch (Exception exception) {
+            throw new RuntimeException("Error while serializing object of type " + serialized.getClass().getSimpleName() + " with contents: " + serialized, exception);
         }
     }
 
-    /**
-     * Serializes the given object. IMPORTANT: Doesn't work with generic objects
-     *
-     * @param clazz  The class of the object that needs to be serialized.
-     * @param object The object that needs to be serialized.
-     * @return The serialized object.
-     */
-    static Object serialize(Class<?> clazz, Object object) {
-        return ((Specific) Serializer.getByClass(clazz)).serialize(object);
-    }
-
-    /**
-     * Deserializes the given object. IMPORTANT: Doesn't work with generic objects
-     *
-     * @param clazz  The class of the object that needs to be deserialized.
-     * @param object The object that needs to be deserialized.
-     * @return The deserialized object.
-     */
-    static Object deserialize(Class<?> clazz, Object object) {
-        return ((Specific) Serializer.getByClass(clazz)).deserialize(clazz, object);
-    }
 
     default boolean isCompatibleWith(Class<?> clazz) {
         final ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericInterfaces()[0];
@@ -112,14 +77,17 @@ public interface Serializer<T, R> {
         return targetClass.equals(clazz);
     }
 
-    interface Generic<T, R> extends Serializer {
-        T deserialize(Field field, R serialized);
-        R serialize(Field field, T object);
-    }
+    T deserialize(TypeReference type, R serialized);
 
-    interface Specific<T, R> extends Serializer {
-        T deserialize(Class<?> fieldClass, R serialized);
-        R serialize(T object);
+    R serialize(TypeReference type, T object);
+
+    default Class<?>[] getGenericTypes(TypeReference typeReference) {
+        if (typeReference.field() == null) {
+            return new Class<?>[0];
+        }
+
+        final ParameterizedType parameterizedType = (ParameterizedType) typeReference.field().getGenericType();
+        return (Class<?>[]) parameterizedType.getActualTypeArguments();
     }
 
 }

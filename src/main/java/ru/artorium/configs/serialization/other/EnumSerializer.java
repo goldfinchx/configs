@@ -1,28 +1,27 @@
 package ru.artorium.configs.serialization.other;
 
-import ru.artorium.configs.serialization.Serializer.Specific;
+import ru.artorium.configs.serialization.TypeReference;
+import ru.artorium.configs.serialization.Serializer;
 import java.util.Arrays;
 
-public class EnumSerializer implements Specific<Enum, String> {
+public class EnumSerializer implements Serializer<Enum, String> {
 
     @Override
-    public Enum deserialize(Class<?> fieldClass, String serialized) {
+    public Enum deserialize(TypeReference typeReference, String serialized) {
         try {
-            return Enum.valueOf((Class<Enum>) fieldClass, serialized);
+            return Enum.valueOf((Class<Enum>) typeReference.clazz(), serialized);
         } catch (IllegalArgumentException ignore) {
-            final String[] existingValues = Arrays.stream(fieldClass.getEnumConstants())
+            final String[] existingValues = Arrays.stream(typeReference.clazz().getEnumConstants())
                 .map(en -> ((Enum) en).name())
                 .toList()
                 .toArray(new String[0]);
 
-            throw new IllegalArgumentException(
-                "Failed to deserialize Enum value: " + serialized + ", as it does not exist, "
-                + "available values: " + String.join(", ", existingValues));
+            throw new IllegalArgumentException("Failed to deserialize Enum value: " + serialized + ", as it does not exist, available values: " + String.join(", ", existingValues));
         }
     }
 
     @Override
-    public String serialize(Enum object) {
+    public String serialize(TypeReference typeReference, Enum object) {
         return object.name();
     }
 

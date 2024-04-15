@@ -1,15 +1,16 @@
 package ru.artorium.configs.serialization.minecraft;
 
-import ru.artorium.configs.serialization.Serializer.Specific;
+import ru.artorium.configs.serialization.TypeReference;
+import ru.artorium.configs.serialization.Serializer;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-public class LocationSerializer implements Specific<Location, Map<String, Object>> {
+public class LocationSerializer implements Serializer<Location, Map<String, Object>> {
 
     @Override
-    public Location deserialize(Class<?> fieldClass, Map<String, Object> map) {
+    public Location deserialize(TypeReference typeReference, Map<String, Object> map) {
         final Location location = new Location(null, 0, 0, 0);
 
         location.setWorld(Bukkit.getWorld((String) map.get("world")));
@@ -28,7 +29,7 @@ public class LocationSerializer implements Specific<Location, Map<String, Object
     }
 
     @Override
-    public Map<String, Object> serialize(Location location) {
+    public Map<String, Object> serialize(TypeReference typeReference, Location location) {
         final Map<String, Object> map = new HashMap<>();
 
         map.put("world", location.getWorld().getName());

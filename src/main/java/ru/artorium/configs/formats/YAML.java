@@ -14,7 +14,8 @@ public class YAML implements Format {
     @Override
     public void writeFile(File file, Map<String, Object> map) {
         try (final FileWriter writer = new FileWriter(file)) {
-            writer.write(new YAMLMapper().writeValueAsString(map));
+            final String yamlString = new YAMLMapper().writeValueAsString(map);
+            writer.write(yamlString);
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

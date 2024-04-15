@@ -1,11 +1,9 @@
 package ru.artorium.configs.serialization.minecraft;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import ru.artorium.configs.serialization.Serializer.Specific;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -13,11 +11,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 
-public class ItemStackSerializer implements Specific<ItemStack, Map<String, Object>> {
-
+public class ItemStackSerializer implements Serializer<ItemStack, Map<String, Object>> {
     @Override
-    public ItemStack deserialize(Class<?> fieldClass, Map<String, Object> map) {
+    public ItemStack deserialize(TypeReference typeReference, Map<String, Object> map) {
         final ItemStack itemStack;
 
         try {
@@ -28,13 +27,14 @@ public class ItemStackSerializer implements Specific<ItemStack, Map<String, Obje
 
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
-        if (map.containsKey("displayName")) {
-            itemMeta.displayName(Component.text((String) map.get("displayName")));
+        if (map.containsKey("name")) {
+            final Component name = (Component) Serializer.deserialize(Component.class, map.get("name"));
+            itemMeta.displayName(name);
         }
 
         if (map.containsKey("lore")) {
             final JSONArray lore = (JSONArray) map.get("lore");
-            itemMeta.lore(lore.stream().map(component -> Component.text((String) component)).toList());
+            itemMeta.lore(lore.stream().map(component -> Serializer.deserialize(Component.class, component)).toList());
         }
 
         if (map.containsKey("customModelData")) {
@@ -59,33 +59,35 @@ public class ItemStackSerializer implements Specific<ItemStack, Map<String, Obje
     }
 
     @Override
-    public Map<String, Object> serialize(ItemStack object) {
+    public Map<String, Object> serialize(TypeReference typeReference, ItemStack item) {
         final Map<String, Object> map = new HashMap<>();
-        final ItemStack itemStack = object;
 
-        map.put("type", itemStack.getType().name());
-        map.put("amount", itemStack.getAmount());
+        map.put("type", item.getType().name());
+        map.put("amount", item.getAmount());
 
-        if (itemStack.getItemMeta().hasDisplayName()) {
-            map.put("displayName", PlainTextComponentSerializer.plainText().serialize(itemStack.getItemMeta().displayName()));
+        if (item.getItemMeta().hasDisplayName()) {
+            map.put("name", Serializer.serialize(Component.class, item.getItemMeta().displayName()));
         }
-        if (itemStack.getItemMeta().hasLore()) {
+
+        if (item.getItemMeta().hasLore()) {
             final JSONArray lore = new JSONArray();
-            Objects.requireNonNull(itemStack.lore()).forEach(component -> lore.add(PlainTextComponentSerializer.plainText().serialize(component)));
+            item.lore().forEach(component -> lore.add(Serializer.serialize(Component.class, component)));
             map.put("lore", lore);
         }
-        if (itemStack.getItemMeta().hasCustomModelData()) {
-            map.put("customModelData", itemStack.getItemMeta().getCustomModelData());
+
+        if (item.getItemMeta().hasCustomModelData()) {
+            map.put("customModelData", item.getItemMeta().getCustomModelData());
         }
-        if (!itemStack.getEnchantments().isEmpty()) {
+
+        if (!item.getEnchantments().isEmpty()) {
             final JSONObject enchantments = new JSONObject();
-            itemStack.getEnchantments().forEach((enchantment, integer) -> enchantments.put(enchantment.getName(), integer));
+            item.getEnchantments().forEach((enchantment, integer) -> enchantments.put(enchantment.getName(), integer));
             map.put("enchantments", enchantments);
         }
 
-        if (!itemStack.getItemFlags().isEmpty()) {
+        if (!item.getItemFlags().isEmpty()) {
             final JSONArray itemFlags = new JSONArray();
-            itemStack.getItemFlags().forEach(itemFlag -> itemFlags.add(itemFlag.name()));
+            item.getItemFlags().forEach(itemFlag -> itemFlags.add(itemFlag.name()));
             map.put("itemFlags", itemFlags);
         }
 
