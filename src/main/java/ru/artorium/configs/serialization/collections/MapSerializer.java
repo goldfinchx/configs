@@ -16,8 +16,8 @@ public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
             .collect(
                 HashMap::new,
                 (map, entry) -> map.put(
-                    Serializer.deserialize(this, new TypeReference(types[0]), entry.getKey()),
-                    Serializer.deserialize(this, new TypeReference(types[1]), entry.getValue())
+                    Serializer.deserialize(types[0], entry.getKey()),
+                    Serializer.deserialize(types[1], entry.getValue())
                 ),
                 HashMap::putAll
             );
@@ -28,8 +28,8 @@ public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
         final Class<?>[] types = this.getGenericTypes(typeReference);
         final JSONObject json = new JSONObject();
         map.forEach(((k, v) -> json.put(
-            Serializer.serialize(this, new TypeReference(types[0]), k),
-            Serializer.serialize(this, new TypeReference(types[1]), v)))
+            Serializer.serialize(types[0], k),
+            Serializer.serialize(types[1], v)))
         );
 
         return json;

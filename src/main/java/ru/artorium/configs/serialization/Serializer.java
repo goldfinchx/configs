@@ -7,6 +7,7 @@ import org.apache.commons.lang.SerializationException;
 import ru.artorium.configs.serialization.collections.ArraySerializer;
 import ru.artorium.configs.serialization.collections.CollectionSerializer;
 import ru.artorium.configs.serialization.collections.MapSerializer;
+import ru.artorium.configs.serialization.minecraft.ComponentSerializer;
 import ru.artorium.configs.serialization.minecraft.ItemStackSerializer;
 import ru.artorium.configs.serialization.minecraft.LocationSerializer;
 import ru.artorium.configs.serialization.minecraft.WorldSerializer;
@@ -30,40 +31,42 @@ public interface Serializer<T, R> extends Serializable {
     ItemStackSerializer ITEMSTACK = new ItemStackSerializer();
     LocationSerializer LOCATION = new LocationSerializer();
     CollectionSerializer COLLECTION = new CollectionSerializer();
+    ComponentSerializer COMPONENT = new ComponentSerializer();
     MapSerializer MAP = new MapSerializer();
     ArraySerializer ARRAY = new ArraySerializer();
     ObjectSerializer OBJECT = new ObjectSerializer();
     Set<Serializer> ALL = Set.of(
         STRING, INTEGER, DOUBLE, LONG, BOOLEAN,
-        ENUM, WORLD, ITEMSTACK, LOCATION,
+        ENUM, WORLD, ITEMSTACK, LOCATION, COMPONENT,
         COLLECTION, MAP, ARRAY, OBJECT
     );
 
 
-    static Serializer getByClass(TypeReference typeReference) {
+    static Serializer getByClass(Class<?> clazz) {
         return ALL.stream()
-            .filter(type -> type.isCompatibleWith(typeReference.clazz()))
+            .filter(type -> type.isCompatibleWith(clazz))
             .findFirst()
             .orElse(OBJECT);
     }
 
-    static Object deserialize(Object parent, TypeReference type, Object serialized) {
-        final Serializer serializer = getByClass(type);
+    static Object deserialize(Class<?> targetClass, Object serialized) {
+        final Serializer serializer = getByClass(targetClass);
 
         try {
-            return serializer.deserialize(type, serialized);
+            return serializer.deserialize(new TypeReference(targetClass), serialized);
         } catch (Exception exception) {
-            throw new SerializationException("Error while deserializing object of type " + serialized.getClass().getSimpleName() + " with parent of type " + parent.getClass().getSimpleName());
+            throw new RuntimeException("Error while deserializing object of type " + serialized.getClass().getSimpleName() + " with contents: " + serialized,
+                exception);
         }
     }
 
-    static Object serialize(Object parent, TypeReference type, Object serialized) {
-        final Serializer serializer = getByClass(type);
+    static Object serialize(Class<?> targetClass, Object serialized) {
+        final Serializer serializer = getByClass(targetClass);
 
         try {
-            return serializer.serialize(type, serialized);
+            return serializer.serialize(new TypeReference(targetClass), serialized);
         } catch (Exception exception) {
-            throw new SerializationException("Error while serializing object of type " + serialized.getClass().getSimpleName() + " with parent of type " + parent.getClass().getSimpleName());
+            throw new RuntimeException("Error while serializing object of type " + serialized.getClass().getSimpleName() + " with contents: " + serialized, exception);
         }
     }
 

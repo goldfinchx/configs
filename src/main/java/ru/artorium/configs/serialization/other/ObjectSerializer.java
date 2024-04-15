@@ -1,5 +1,6 @@
 package ru.artorium.configs.serialization.other;
 
+import ru.artorium.configs.Utils;
 import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.annotations.Ignore;
 import ru.artorium.configs.serialization.Serializer;
@@ -19,18 +20,17 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
         try {
             instance = typeReference.clazz().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Failed to create instance for a field: " + typeReference.clazz().getName() +
-                                       ", make sure you provided no-args constructor for this class", e);
+            throw new RuntimeException("Failed to create instance for: " + typeReference.clazz().getName() + ", make sure you provided no-args constructor for this class", e);
         }
 
-        this.getFields(instance).forEach(field -> {
+        Utils.getFields(instance).forEach(field -> {
             final String key = field.getName().replaceAll("(?=[A-Z0-9])", "-").toLowerCase();
             final Object value = serialized.get(key);
 
             try {
-                field.set(instance, Serializer.deserialize(this, new TypeReference(field), value));
+                field.set(instance, Serializer.deserialize(field.getClass(), value));
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to deserialize field: " + field.getName(), e);
+                throw new RuntimeException("Failed to deserialize field: " + field.getName() + " for object: " + instance.getClass().getSimpleName(), e);
             }
         });
 
@@ -41,14 +41,14 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
     public LinkedHashMap<String, Object> serialize(TypeReference typeReference, Object object) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
 
-        this.getFields(object).forEach(objectField -> {
+        Utils.getFields(object).forEach(objectField -> {
             final String key = objectField.getName().replaceAll("(?=[A-Z0-9])", "-").toLowerCase();
             final Object value;
 
             try {
-                value = Serializer.serialize(this, new TypeReference(objectField), objectField.get(object));
+                value = Serializer.serialize(objectField.getClass(), objectField.get(object));
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to serialize field: " + objectField.getName(), e);
+                throw new RuntimeException("Failed to serialize field: " + objectField.getName() + " for object: " + object.getClass().getSimpleName(), e);
             }
 
             map.put(key, value);
@@ -57,14 +57,6 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
         return map;
     }
 
-
-    private List<Field> getFields(Object object) {
-        return FieldUtils.getAllFieldsList(object.getClass())
-            .stream()
-            .filter(field -> !field.isAnnotationPresent(Ignore.class))
-            .peek(field -> field.setAccessible(true))
-            .toList();
-    }
 
     @Override
     public boolean isCompatibleWith(Class clazz) {

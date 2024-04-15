@@ -16,9 +16,7 @@ public class EnumSerializer implements Serializer<Enum, String> {
                 .toList()
                 .toArray(new String[0]);
 
-            throw new IllegalArgumentException(
-                "Failed to deserialize Enum value: " + serialized + ", as it does not exist, "
-                + "available values: " + String.join(", ", existingValues));
+            throw new IllegalArgumentException("Failed to deserialize Enum value: " + serialized + ", as it does not exist, available values: " + String.join(", ", existingValues));
         }
     }
 

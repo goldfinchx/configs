@@ -2,17 +2,14 @@ package ru.artorium.configs;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.logging.Level;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import ru.artorium.configs.annotations.Ignore;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 import ru.artorium.configs.formats.Format;
 import ru.artorium.configs.formats.JSON;
 import ru.artorium.configs.formats.YAML;
@@ -21,23 +18,21 @@ import ru.artorium.configs.serialization.TypeReference;
 
 @Getter
 @NoArgsConstructor
-public abstract class Config {
+public abstract class Config implements Serializable {
 
-    @Ignore
-    private File file;
-    @Ignore
-    private Format format;
-    @Ignore
-    private LinkedHashMap<String, Object> map;
-    @Ignore
-    private TypeReference typeReference;
+    private transient File file;
+    private transient Format format;
+    private transient Map<String, Object> map;
 
     public Config(String fileName, String path) {
         this.file = new File(path, fileName);
         this.format = fileName.endsWith(".yaml") || fileName.endsWith(".yml") ? new YAML() : new JSON();
-        this.map = new LinkedHashMap<>(this.format.readFile(this.file));
-        this.typeReference = new TypeReference(this.getClass());
+        this.map = this.format.readFile(this.file);
         this.reload();
+    }
+
+    public Config(String fileName, JavaPlugin plugin) {
+        this(fileName, plugin.getDataFolder().getPath());
     }
 
     public void reload() {
@@ -45,12 +40,13 @@ public abstract class Config {
             this.createFile();
         }
 
-        this.fillMissingValues();
+        this.setMissingValues();
         this.updateValues();
     }
 
-    private void fillMissingValues() {
-        final Map<String, Object> serialized = (Map<String, Object>) Serializer.serialize(this, this.typeReference, this.getTemplate());
+    private void setMissingValues() {
+        this.map = this.format.readFile(this.file);
+        final Map<String, Object> serialized = Serializer.OBJECT.serialize(new TypeReference(this), this.getTemplate());
         serialized.forEach((key, value) -> this.map.putIfAbsent(key, value));
         this.format.writeFile(this.file, this.map);
     }
@@ -59,27 +55,20 @@ public abstract class Config {
         try {
             return this.getClass().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            System.err.println("Cannot create an instance of " + this.getClass().getName() + " class, please check if it has a default no args constructor");
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to create a new instance of the config class", e);
+            Bukkit.getLogger().log(Level.SEVERE, "Please make sure that the config class has a default no-args constructor");
             throw new RuntimeException(e);
         }
     }
 
     private void updateValues() {
-        final Object deserialized = Serializer.deserialize(this, this.typeReference, this.map);
-        this.getFields().forEach(field -> {
+        Utils.getFields(this.getClass()).forEach(field -> {
             try {
-                field.set(this, field.get(deserialized));
+                field.set(this, this.map.get(field.getName()));
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to update the value of the field " + field.getName(), e);
             }
         });
-    }
-
-    private List<Field> getFields() {
-        return Arrays.stream(FieldUtils.getAllFields(this.getClass()))
-            .filter(field -> !field.isAnnotationPresent(Ignore.class))
-            .peek(field -> field.setAccessible(true))
-            .collect(Collectors.toList());
     }
 
     private void createFile() {

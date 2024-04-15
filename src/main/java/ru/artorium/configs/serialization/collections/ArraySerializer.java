@@ -12,17 +12,17 @@ public class ArraySerializer implements Serializer<Object[], Collection<?>> {
     @Override
     public Collection<?> serialize(TypeReference typeReference, Object[] object) {
         final List<?> list = Arrays.asList(object);
-        final TypeReference genericType = new TypeReference(typeReference.clazz().getComponentType());
+        final Class<?> targetClass = typeReference.clazz().getComponentType();
         final JSONArray json = new JSONArray();
 
-        list.forEach(value -> json.add(Serializer.serialize(this, genericType, value)));
+        list.forEach(value -> json.add(Serializer.serialize(targetClass, value)));
         return json;
     }
 
     @Override
     public Object[] deserialize(TypeReference typeReference, Collection<?> serialized) {
-        final TypeReference genericType = new TypeReference(typeReference.clazz().getComponentType());
-        return serialized.stream().map(value -> Serializer.deserialize(this, genericType, value)).toArray();
+        final Class<?> targetClass = typeReference.clazz().getComponentType();
+        return serialized.stream().map(value -> Serializer.deserialize(targetClass, value)).toArray();
     }
 
     @Override
