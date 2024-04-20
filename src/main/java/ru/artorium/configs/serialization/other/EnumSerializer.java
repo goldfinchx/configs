@@ -1,7 +1,7 @@
 package ru.artorium.configs.serialization.other;
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 import java.util.Arrays;
 
 public class EnumSerializer implements Serializer<Enum, String> {

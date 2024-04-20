@@ -1,9 +1,9 @@
 package ru.artorium.configs.serialization.minecraft;
 
+import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import ru.artorium.configs.serialization.TypeReference;
-import ru.artorium.configs.serialization.Serializer;
 
 public class ComponentSerializer implements Serializer<Component, String> {
 

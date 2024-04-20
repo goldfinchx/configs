@@ -1,8 +1,8 @@
 package ru.artorium.configs.serialization.primitives;
 
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 
 public class BooleanSerializer implements Serializer<Boolean, Boolean> {
 

@@ -1,10 +1,9 @@
 package ru.artorium.configs.serialization.collections;
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
-import org.json.simple.JSONObject;
 
 public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
 
@@ -26,13 +25,14 @@ public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
     @Override
     public Map<?, ?> serialize(TypeReference typeReference, Map<?, ?> map) {
         final Class<?>[] types = this.getGenericTypes(typeReference);
-        final JSONObject json = new JSONObject();
-        map.forEach(((k, v) -> json.put(
+        final Map serialized = new HashMap<>();
+
+        map.forEach(((k, v) -> serialized.put(
             Serializer.serialize(types[0], k),
             Serializer.serialize(types[1], v)))
         );
 
-        return json;
+        return serialized;
     }
 
     @Override

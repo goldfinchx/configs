@@ -1,7 +1,7 @@
 package ru.artorium.configs.serialization.minecraft;
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Bukkit;

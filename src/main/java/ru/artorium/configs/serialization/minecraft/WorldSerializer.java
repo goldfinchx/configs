@@ -1,8 +1,7 @@
 package ru.artorium.configs.serialization.minecraft;
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
-
+import ru.artorium.configs.serialization.TypeReference;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 

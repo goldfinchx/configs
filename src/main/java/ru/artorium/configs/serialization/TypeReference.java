@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
-import ru.artorium.configs.Config;
 
 @Getter
 @Accessors(fluent = true)

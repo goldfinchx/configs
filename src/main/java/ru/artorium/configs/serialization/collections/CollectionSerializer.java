@@ -1,7 +1,7 @@
 package ru.artorium.configs.serialization.collections;
 
-import ru.artorium.configs.serialization.TypeReference;
 import ru.artorium.configs.serialization.Serializer;
+import ru.artorium.configs.serialization.TypeReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.json.simple.JSONArray;
