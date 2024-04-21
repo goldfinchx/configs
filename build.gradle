@@ -29,6 +29,15 @@ jar {
     archiveFileName = 'configs' + '-' + version + '.jar'
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+
 publishToMavenLocal {
     dependsOn shadowJar
 }
