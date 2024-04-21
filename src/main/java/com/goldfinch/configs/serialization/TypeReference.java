@@ -1,20 +1,18 @@
 package com.goldfinch.configs.serialization;
 
 import java.lang.reflect.Field;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Accessors(fluent = true)
 public class TypeReference {
 
     private final @NonNull Class<?> clazz;
-    private final @Nullable Field field;
+    private final Field field;
 
-    public TypeReference(@NotNull Class<?> clazz) {
+    public TypeReference(Class<?> clazz) {
         this.clazz = clazz;
         this.field = null;
     }

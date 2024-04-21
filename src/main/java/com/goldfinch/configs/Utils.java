@@ -18,4 +18,15 @@ public class Utils {
             .toList();
     }
 
+    public static boolean isServerUsesComponents() {
+        try {
+            Class.forName("net.kyori.adventure.text.Component");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+
 }

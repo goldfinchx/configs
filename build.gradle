@@ -3,19 +3,22 @@ plugins {
     id 'maven-publish'
     id 'io.freefair.lombok' version '8.4'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'io.papermc.paperweight.userdev' version '1.5.5'
+    id 'io.papermc.paperweight.userdev' version '1.5.11'
 }
 
 group 'com.github.goldfinchx'
-version '1.0.3'
+version '1.0.4'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
-    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20-R0.1-SNAPSHOT")
+    paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.20.4-R0.1-SNAPSHOT')
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.0-rc1'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 publishing {
@@ -24,4 +27,8 @@ publishing {
             from components.java
         }
     }
+}
+
+jar {
+    archiveFileName = 'configs' + '-' + version + '.jar'
 }
