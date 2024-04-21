@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.github.goldfinchx'
-version '1.0.7'
+version '1.0.9'
 
 repositories {
     mavenCentral()
@@ -21,12 +21,8 @@ dependencies {
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
-shadowJar {
-    archiveFileName = 'configs' + '-' + version + '.jar'
-}
-
-jar {
-    archiveFileName = 'configs' + '-' + version + '.jar'
+reobfJar {
+    outputJar = file('build/libs/' + project.name + '-' + project.version + '.jar')
 }
 
 publishing {
@@ -35,9 +31,4 @@ publishing {
             from components.java
         }
     }
-}
-
-
-publishToMavenLocal {
-    dependsOn shadowJar
 }
