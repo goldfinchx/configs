@@ -12,13 +12,49 @@ set values from the config file. You can also create custom serializers for your
 - Locations
 - Adventure Text Components
 
+### Adding to your project
+**IMPORTANT: Use shadowing to add the library into your project**
+
+#### Gradle
+```groovy
+repositories {
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    implementation 'com.github.goldfinchx:configs:1.1.0'
+}
+```
+
+#### Maven
+```xml
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.goldfinchx</groupId>
+            <artifactId>configs</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+    </dependencies>
+```
+
+
+
 
 ### Creating your config class
 It is super easy to create a new config class, just extend the Config class, add your fields, and provide a default
 no-args constructor. That's it.
 ```java
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor // you MUST add no-args constructor
 public class TestConfig extends Config {
 
     private String value = "This is String value!";
@@ -26,16 +62,14 @@ public class TestConfig extends Config {
     private ItemStack itemStackValue = new ItemStack(Material.STONE, 1);
     private Map<Integer, Material> mapValue = Map.of(1, Material.STONE);
 
-    @Ignore
     private final String ignoredValue;
-
-    private int rangedValue = 10;
+    private transient int ignoredValue2;
 
     public TestConfig(JavaPlugin plugin) {
         // Formats available: JSON and YAML (change the type of the file to x.json or x.yaml/x.yml)
         super("fileName.yml", plugin.getDataFolder().getPath());
 
-        // get updated values from the file and use this in your reload command
+        // you MUST add this command to get updated values from the file and use this in your reload command
         this.reload();     
     }
 }
