@@ -29,6 +29,6 @@ publishing {
     }
 }
 
-jar {
+shadowJar {
     archiveFileName = 'configs' + '-' + version + '.jar'
 }
