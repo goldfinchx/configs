@@ -2,6 +2,7 @@ package com.goldfinch.configs.serialization.other;
 
 import com.goldfinch.configs.serialization.Serializer;
 import com.goldfinch.configs.serialization.TypeReference;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ArraySerializer implements Serializer<Object[], Collection<?>> {
         return serialized.stream()
             .map(value -> Serializer.deserialize(targetClass, value))
             .map(targetClass::cast)
-            .toArray();
+            .toArray(size -> (Object[]) Array.newInstance(targetClass, size));
     }
 
     @Override

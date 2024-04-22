@@ -32,7 +32,8 @@ jobs:
 
     - name: Get version from Gradle project
       id: get_version
-      run: echo "::set-output name=version::$(gradle properties -q | grep "version" | awk -F:'{print $2}' | tr -d ' ')"
+      run: |
+        echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
 
     - name: Create Release
       id: create_release
@@ -42,7 +43,6 @@ jobs:
       with:
         tag_name: ${{ steps.get_version.outputs.version }}
         release_name: 'v${{ steps.get_version.outputs.version }} Release'
-        body: 'Release created by GitHub Actions'
 
   dependency-submission:
     runs-on: ubuntu-latest
