@@ -42,6 +42,7 @@ jobs:
       with:
         tag_name: ${{ steps.get_version.outputs.version }}
         release_name: 'v${{ steps.get_version.outputs.version }} Release'
+        body: 'Release created by GitHub Actions'
 
   dependency-submission:
     runs-on: ubuntu-latest
