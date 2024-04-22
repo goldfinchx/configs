@@ -32,7 +32,7 @@ jobs:
 
     - name: Get version from Gradle project
       id: get_version
-      run: echo ::set-output name=version::$(gradle properties -q | grep "version" | awk -F:'{print $2}' | tr -d ' ')
+      run: echo "::set-output name=version::$(gradle properties -q | grep "version" | awk -F:'{print $2}' | tr -d ' ')"
 
     - name: Create Release
       id: create_release
