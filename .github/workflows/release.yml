@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        echo "version_name=${{steps.project_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
+        echo "VERSION_NAME=${{steps.project_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
 
     - name: Create Release
       id: create_release
@@ -46,8 +46,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{env.version_name}}
-        release_name: 'v${{env.version_name}} Release'
+        tag_name: ${{env.VERSION_NAME}}
+        release_name: 'v${{env.VERSION_NAME}} Release'
 
   dependency-submission:
     runs-on: ubuntu-latest
