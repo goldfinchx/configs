@@ -30,10 +30,15 @@ jobs:
         chmod +x ./gradlew
         ./gradlew build
 
-    - name: Get version from Gradle project
+    - name: Retrive Version
+      id: project_version
+      run: |
+        echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
+
+    - name: Get version
       id: get_version
       run: |
-        echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
+        echo "version_name=${{steps.project_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
 
     - name: Create Release
       id: create_release
@@ -41,8 +46,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        release_name: 'v${{ steps.get_version.outputs.version }} Release'
+        tag_name: ${{env.version_name}}
+        release_name: 'v${{env.version_name}} Release'
 
   dependency-submission:
     runs-on: ubuntu-latest
