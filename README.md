@@ -13,7 +13,7 @@ set values from the config file. You can also create custom serializers for your
 - Adventure Text Components
 
 ### Adding to your project
-####Important
+#### Important
 After you added the library as a dependency, you have 2 choices:
 1. Add the library as a plugin to your server
 ```yaml
