@@ -1,0 +1,6 @@
+name: "Configs"
+author: Goldfinch
+version: "${version}"
+description: "A simple configuration plugin for Spigot"
+api-version: 1.17
+main: com.goldfinch.configs.ConfigsPlugin
