@@ -49,6 +49,17 @@ jobs:
         tag_name: ${{env.VERSION_NAME}}
         release_name: 'v${{env.VERSION_NAME}} Release'
 
+    - name: Upload Artifact
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/libs/Configs-${{env.VERSION_NAME}}.jar
+        asset_name: Configs-${{env.VERSION_NAME}}.jar
+        asset_content_type: application/java-archive
+
   dependency-submission:
     runs-on: ubuntu-latest
     permissions:
