@@ -13,7 +13,13 @@ set values from the config file. You can also create custom serializers for your
 - Adventure Text Components
 
 ### Adding to your project
-**IMPORTANT: Use shadowing to add the library into your project**
+####Important
+After you added the library as a dependency, you have 2 choices:
+1. Add the library as a plugin to your server
+```yaml
+depends: [Configs]
+```
+2. Shade the library into your code
 
 #### Gradle
 ```groovy
@@ -24,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.goldfinchx:configs:1.1.0'
+    compileOnly 'com.github.goldfinchx:configs:1.1.3'
 }
 ```
 
@@ -41,7 +47,7 @@ dependencies {
         <dependency>
             <groupId>com.github.goldfinchx</groupId>
             <artifactId>configs</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.3</version>
         </dependency>
     </dependencies>
 ```
