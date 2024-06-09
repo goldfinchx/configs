@@ -3,6 +3,8 @@ package com.goldfinch.configs.serialization.other;
 import com.goldfinch.configs.Utils;
 import com.goldfinch.configs.serialization.Serializer;
 import com.goldfinch.configs.serialization.TypeReference;
+
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,7 +16,9 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
         final Object instance;
 
         try {
-            instance = typeReference.clazz().getConstructor().newInstance();
+            Constructor c = typeReference.clazz().getConstructor();
+            c.setAccessible(true);
+            instance = c.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException("Failed to create instance for: " + typeReference.clazz().getName() + ", make sure you provided no-args constructor for this class", e);
         }

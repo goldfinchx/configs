@@ -15,6 +15,7 @@ public class ArraySerializer implements Serializer<Object[], Collection<?>> {
         final Class<?> targetClass = typeReference.clazz().getComponentType();
         final JSONArray json = new JSONArray();
 
+        //noinspection unchecked
         list.forEach(value -> json.add(Serializer.serialize(targetClass, value)));
         return json;
     }
@@ -26,7 +27,7 @@ public class ArraySerializer implements Serializer<Object[], Collection<?>> {
     }
 
     @Override
-    public boolean isCompatibleWith(Class clazz) {
+    public boolean isCompatibleWith(Class<?> clazz) {
         return clazz.isArray();
     }
 }

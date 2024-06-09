@@ -8,7 +8,7 @@ import java.util.Map;
 public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
 
     @Override
-    public Map deserialize(TypeReference typeReference, Map<?, ?> serialized) {
+    public Map<?, ?> deserialize(TypeReference typeReference, Map<?, ?> serialized) {
         final Class<?>[] types = this.getGenericTypes(typeReference);
         return serialized.entrySet()
             .stream()
@@ -25,7 +25,7 @@ public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
     @Override
     public Map<?, ?> serialize(TypeReference typeReference, Map<?, ?> map) {
         final Class<?>[] types = this.getGenericTypes(typeReference);
-        final Map serialized = new HashMap<>();
+        final Map<Object, Object> serialized = new HashMap<>();
 
         map.forEach(((k, v) -> serialized.put(
             Serializer.serialize(types[0], k),
@@ -36,7 +36,7 @@ public class MapSerializer implements Serializer<Map<?, ?>, Map<?, ?>> {
     }
 
     @Override
-    public boolean isCompatibleWith(Class clazz) {
+    public boolean isCompatibleWith(Class<?> clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
 }
