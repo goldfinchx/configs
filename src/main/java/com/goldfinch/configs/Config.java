@@ -1,9 +1,8 @@
 package com.goldfinch.configs;
 
-import com.goldfinch.configs.formats.JSON;
 import com.goldfinch.configs.serialization.Serializer;
 import com.goldfinch.configs.formats.Format;
-import com.goldfinch.configs.formats.YAML;
+import com.goldfinch.configs.serialization.SerializerFactory;
 import com.goldfinch.configs.serialization.TypeReference;
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +58,10 @@ public abstract class Config {
 
     public Config(String fileName, String path) {
         this.file = new File(path, fileName);
-        this.format = fileName.endsWith(".yaml") || fileName.endsWith(".yml") ? new YAML() : new JSON();
+        this.format = Format.factory().getFormatFromFileName(fileName);
+        if(format == null){
+            throw new NullPointerException("File format "+fileName+" not found. Maybe you forgot to specify the dependency in plugin.yml?");
+        }
         this.fileMap = this.format.readFile(this.file);
         this.reload();
     }
@@ -69,14 +71,27 @@ public abstract class Config {
             this.createFile();
         }
 
-        this.setMissingValues();
+        this.saveValues(true);
         this.updateValues();
     }
+    public void save(){
+        if (!this.file.exists()) {
+            this.createFile();
+        }
 
-    private void setMissingValues() {
+        this.saveValues(false);
+    }
+
+    private void saveValues(boolean missingOnly) {
         this.fileMap = this.format.readFile(this.file);
-        final Map<String, Object> serialized = Serializer.OBJECT.serialize(new TypeReference(this), this.getTemplate());
-        serialized.forEach((key, value) -> this.fileMap.putIfAbsent(key, value));
+        final Map<String, Object> serialized = SerializerFactory.OBJECT.serialize(new TypeReference(this), missingOnly ? this.getTemplate() : this);
+        serialized.forEach((key, value) -> {
+            if(missingOnly){
+                this.fileMap.putIfAbsent(key, value);
+            }else{
+                this.fileMap.put(key, value);
+            }
+        });
         this.format.writeFile(this.file, this.fileMap);
     }
 

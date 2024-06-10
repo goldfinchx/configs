@@ -87,7 +87,10 @@ public class ItemStackSerializer implements Serializer<ItemStack, Map<String, Ob
 
         if (item.getItemMeta().hasLore()) {
             final List<String> lore = new ArrayList<>();
-            item.lore().forEach(component -> lore.add((String) Serializer.serialize(Component.class, component)));
+            List<Component> loreComponents = item.lore();
+            if(loreComponents != null){
+                loreComponents.forEach(component -> lore.add((String) Serializer.serialize(Component.class, component)));
+            }
             map.put("lore", lore);
         }
 
