@@ -32,7 +32,6 @@ public class JSON implements Format {
         }
 
         try (final FileReader reader = new FileReader(file)) {
-            //noinspection unchecked
             final Map<String, Object> parsed = (Map<String, Object>) parser.parse(reader);
             return new LinkedHashMap<>(parsed);
         } catch (IOException | ParseException e) {

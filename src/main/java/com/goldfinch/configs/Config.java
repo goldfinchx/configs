@@ -59,8 +59,8 @@ public abstract class Config {
     public Config(String fileName, String path) {
         this.file = new File(path, fileName);
         this.format = Format.factory().getFormatFromFileName(fileName);
-        if(format == null){
-            throw new NullPointerException("File format "+fileName+" not found. Maybe you forgot to specify the dependency in plugin.yml?");
+        if (this.format == null){
+            throw new NullPointerException("File format " + fileName + " not found. Maybe you forgot to specify the dependency in plugin.yml?");
         }
         this.fileMap = this.format.readFile(this.file);
         this.reload();
@@ -71,27 +71,14 @@ public abstract class Config {
             this.createFile();
         }
 
-        this.saveValues(true);
+        this.setMissingValues();
         this.updateValues();
     }
-    public void save(){
-        if (!this.file.exists()) {
-            this.createFile();
-        }
 
-        this.saveValues(false);
-    }
-
-    private void saveValues(boolean missingOnly) {
+    private void setMissingValues() {
         this.fileMap = this.format.readFile(this.file);
-        final Map<String, Object> serialized = SerializerFactory.OBJECT.serialize(new TypeReference(this), missingOnly ? this.getTemplate() : this);
-        serialized.forEach((key, value) -> {
-            if(missingOnly){
-                this.fileMap.putIfAbsent(key, value);
-            }else{
-                this.fileMap.put(key, value);
-            }
-        });
+        final Map<String, Object> serialized = SerializerFactory.OBJECT.serialize(new TypeReference(this), this.getTemplate());
+        serialized.forEach((key, value) -> this.fileMap.putIfAbsent(key, value));
         this.format.writeFile(this.file, this.fileMap);
     }
 

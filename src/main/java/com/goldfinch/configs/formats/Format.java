@@ -7,20 +7,19 @@ public interface Format {
 
     /**
      * Write the map to the file
-     *
      * @see #readFile(File)
      *
      * @param file File
-     * @param map Map
+     * @param map Key-value map to be written to the file
      */
     void writeFile(File file, Map<String, Object> map);
 
     /**
-     * You shouldn't deserialize the file. Return a string-object map.
+     * Read the file and return the key-value map
+     * @see #writeFile(File, Map)
+     *
      * @param file File
-     * @return Key-value map. The value can be primitive
-     * types (number, string, boolean, etc.), list, and
-     * submap. A submap can also have key-values. Looks like recursion
+     * @return deserialized file in a form of key-value map
      */
     Map<String, Object> readFile(File file);
 

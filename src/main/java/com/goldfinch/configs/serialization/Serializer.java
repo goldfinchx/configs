@@ -1,26 +1,9 @@
 package com.goldfinch.configs.serialization;
 
-import com.goldfinch.configs.serialization.minecraft.WorldSerializer;
-import com.goldfinch.configs.serialization.other.EnumSerializer;
-import com.goldfinch.configs.serialization.collections.CollectionSerializer;
-import com.goldfinch.configs.serialization.collections.MapSerializer;
-import com.goldfinch.configs.serialization.minecraft.ComponentSerializer;
-import com.goldfinch.configs.serialization.minecraft.ItemStackSerializer;
-import com.goldfinch.configs.serialization.minecraft.LocationSerializer;
-import com.goldfinch.configs.serialization.other.ArraySerializer;
-import com.goldfinch.configs.serialization.other.ObjectSerializer;
-import com.goldfinch.configs.serialization.other.UUIDSerializer;
-import com.goldfinch.configs.serialization.primitives.BooleanSerializer;
-import com.goldfinch.configs.serialization.primitives.CharacterSerializer;
-import com.goldfinch.configs.serialization.primitives.DoubleSerializer;
-import com.goldfinch.configs.serialization.primitives.IntegerSerializer;
-import com.goldfinch.configs.serialization.primitives.StringSerializer;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -30,7 +13,7 @@ import java.util.Set;
 public interface Serializer<T, R> extends Serializable {
 
     static Object deserialize(Field field, Object serialized) {
-        final Serializer serializer = factory().get(field.getType());
+        final Serializer serializer = SerializerFactory.getFactory().get(field.getType());
 
         try {
             return serializer.deserialize(new TypeReference(field), serialized);
@@ -41,7 +24,7 @@ public interface Serializer<T, R> extends Serializable {
     }
 
     static Object serialize(Field field, Object serialized) {
-        final Serializer serializer = factory().get(field.getType());
+        final Serializer serializer = SerializerFactory.getFactory().get(field.getType());
 
         try {
             return serializer.serialize(new TypeReference(field), serialized);
@@ -52,7 +35,7 @@ public interface Serializer<T, R> extends Serializable {
     }
 
     static Object deserialize(Class<?> targetClass, Object serialized) {
-        final Serializer serializer = factory().get(targetClass);
+        final Serializer serializer = SerializerFactory.getFactory().get(targetClass);
 
         try {
             return serializer.deserialize(new TypeReference(targetClass), serialized);
@@ -63,7 +46,7 @@ public interface Serializer<T, R> extends Serializable {
     }
 
     static Object serialize(Class<?> targetClass, Object serialized) {
-        final Serializer serializer = factory().get(targetClass);
+        final Serializer serializer = SerializerFactory.getFactory().get(targetClass);
 
         try {
             return serializer.serialize(new TypeReference(targetClass), serialized);
@@ -71,11 +54,6 @@ public interface Serializer<T, R> extends Serializable {
             throw new RuntimeException("Error while serializing object of type " + serialized.getClass().getSimpleName() + " with contents: " + serialized, exception);
         }
     }
-
-    static SerializerFactory factory() {
-        return SerializerFactory.getFactory();
-    }
-
 
     default boolean isCompatibleWith(Class<?> clazz) {
         final ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericInterfaces()[0];

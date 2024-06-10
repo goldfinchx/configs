@@ -12,7 +12,6 @@ public class CollectionSerializer implements Serializer<Collection<?>, Collectio
     public Collection<?> serialize(TypeReference typeReference, Collection<?> collection) {
         final Class<?> type = this.getGenericTypes(typeReference)[0];
         final JSONArray array = new JSONArray();
-        //noinspection unchecked
         collection.forEach(value -> array.add(Serializer.serialize(type, value)));
         return array;
     }

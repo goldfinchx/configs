@@ -16,7 +16,7 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
         final Object instance;
 
         try {
-            Constructor c = typeReference.clazz().getConstructor();
+            final Constructor c = typeReference.clazz().getConstructor();
             c.setAccessible(true);
             instance = c.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
