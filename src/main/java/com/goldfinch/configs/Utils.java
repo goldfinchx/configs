@@ -9,7 +9,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class Utils {
 
-    public static List<Field> getFields(Object object) {
+    public static List<Field> getSerializableFields(Object object) {
         return Arrays.stream(FieldUtils.getAllFields(object.getClass()))
             .filter(field -> !Modifier.isStatic(field.getModifiers()))
             .filter(field -> !Modifier.isFinal(field.getModifiers()))

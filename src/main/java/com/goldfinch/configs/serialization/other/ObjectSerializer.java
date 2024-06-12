@@ -23,7 +23,7 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
             throw new RuntimeException("Failed to create instance for: " + typeReference.clazz().getName() + ", make sure you provided no-args constructor for this class", e);
         }
 
-        Utils.getFields(instance).forEach(field -> {
+        Utils.getSerializableFields(instance).forEach(field -> {
             final String key = field.getName().replaceAll("(?=[A-Z0-9])", "-").toLowerCase();
             final Object value = serialized.get(key);
 
@@ -44,7 +44,7 @@ public class ObjectSerializer implements Serializer<Object, Map<String, Object>>
     public LinkedHashMap<String, Object> serialize(TypeReference typeReference, Object object) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
 
-        Utils.getFields(object).forEach(field -> {
+        Utils.getSerializableFields(object).forEach(field -> {
             final String key = field.getName().replaceAll("(?=[A-Z0-9])", "-").toLowerCase();
             final Object value;
 
