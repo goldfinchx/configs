@@ -1,18 +1,19 @@
 package com.goldfinch.configs;
 
-import com.goldfinch.configs.serialization.Serializer;
 import com.goldfinch.configs.formats.Format;
+import com.goldfinch.configs.serialization.Serializer;
 import com.goldfinch.configs.serialization.SerializerFactory;
 import com.goldfinch.configs.serialization.TypeReference;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.logging.Level;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 
 
 /**
@@ -57,43 +58,61 @@ public abstract class Config {
     }
 
     public Config(String fileName, String path) {
+        this.validateConfigClass();
         this.file = new File(path, fileName);
         this.format = Format.factory().getFormatFromFileName(fileName);
         if (this.format == null){
             throw new NullPointerException("File format " + fileName + " not found. Maybe you forgot to specify the dependency in plugin.yml?");
         }
-        this.fileMap = this.format.readFile(this.file);
         this.reload();
     }
 
     public void reload() {
-        if (!this.file.exists()) {
-            this.createFile();
-        }
+        this.createFile();
 
         this.setMissingValues();
         this.updateValues();
     }
 
+    private void validateConfigClass(){
+        try {
+            this.getClass().getConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Constructor without arguments not found.");
+        }
+    }
+
+    /**
+     * Save non-existent values into the config file
+     */
     private void setMissingValues() {
+        // read the file
         this.fileMap = this.format.readFile(this.file);
+        // serialize config class
         final Map<String, Object> serialized = SerializerFactory.OBJECT.serialize(new TypeReference(this), this.getTemplate());
-        serialized.forEach((key, value) -> this.fileMap.putIfAbsent(key, value));
-        this.format.writeFile(this.file, this.fileMap);
+        // remember the initial number of keys
+        int keys = this.fileMap.keySet().size();
+        // insert non-existent values
+        serialized.forEach(this.fileMap::putIfAbsent);
+        // check for map changes
+        if(keys != this.fileMap.keySet().size()){ // prevent the load on the drive
+            // save into file
+            this.format.writeFile(this.file, this.fileMap);
+        }
     }
 
     private Config getTemplate() {
         try {
             return this.getClass().getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Failed to create a new instance of the config class", e);
-            Bukkit.getLogger().log(Level.SEVERE, "Please make sure that the config class has a default no-args constructor");
+            ConfigsPlugin.getBukkitLogger().log(Level.SEVERE, "Failed to create a new instance of the config class", e);
+            ConfigsPlugin.getBukkitLogger().log(Level.SEVERE, "Please make sure that the config class has a default no-args constructor");
             throw new RuntimeException(e);
         }
     }
 
     private void updateValues() {
-        Utils.getFields(this).forEach(field -> {
+        Utils.getSerializableFields(this).forEach(field -> {
             final String key = field.getName().replaceAll("(?=[A-Z0-9])", "-").toLowerCase();
 
             try {
@@ -109,14 +128,18 @@ public abstract class Config {
     }
 
     private void createFile() {
-        if (!this.file.getParentFile().exists()) {
-            this.file.getParentFile().mkdirs();
-        }
-
         try {
-            this.file.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (this.file.getParentFile().isFile() || this.file.isDirectory()){
+                throw new IllegalStateException("Invalid config path.");
+            }
+            if (!this.file.getParentFile().isDirectory()) {
+                Files.createDirectories(this.file.getParentFile().toPath());
+            }
+            if (!this.file.isFile()) {
+                Files.createFile(this.file.toPath());
+            }
+        } catch (IOException exception){
+            throw new RuntimeException("Failed initialize " + this.getClass().getName() + "'s file system.", exception);
         }
     }
 
